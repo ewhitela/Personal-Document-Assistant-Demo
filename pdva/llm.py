@@ -33,10 +33,12 @@ class LocalLLM:
     """
 
     DEFAULT_SYSTEM = (
-        "You are a helpful assistant. Answer using ONLY the provided context. "
-        "If the answer is not in the context, say you do not know. "
-        "For each claim, state which source it came from (filename, and page "
-        "number if available), and briefly note what part of the source supports it."
+        "You are a precise assistant. Answer using ONLY the provided context.\n"
+        "- If the context fully answers the question, answer it directly.\n"
+        "- If the context is partially relevant, answer what you can and state "
+        "explicitly what information is missing. Do not guess the rest.\n"
+        "- If the context contains nothing relevant, reply exactly: "
+        "\"I don't know based on your documents.\" and nothing else."
     )
 
     def __init__(self,
