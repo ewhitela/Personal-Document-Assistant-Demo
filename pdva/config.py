@@ -1,3 +1,5 @@
+
+
 """One place for the settings every module shares.
 
 Change a default here and the whole pipeline agrees. Beginners: you do not need
@@ -27,3 +29,24 @@ LLM_TEMPERATURE = 0.2                  # low = more deterministic, good for grou
 
 # Week 6: how many passages to retrieve per question.
 RAG_TOP_K = 4
+
+# Week 7: speech-to-text (faster-whisper).
+WHISPER_MODEL = "base.en"     # tiny.en / base.en / small.en. ".en" is English-only and faster.
+WHISPER_DEVICE = "auto"       # "cuda" on the 1080Ti, "cpu" otherwise.
+WHISPER_COMPUTE = "auto"      # "float16" on GPU, "int8" on CPU.
+
+# Week 8: text-to-speech (Piper).
+# Download the voice first: python -m piper.download_voices en_US-lessac-medium
+PIPER_VOICE = "en_US-lessac-medium.onnx"
+PIPER_USE_CUDA = False        # True needs onnxruntime-gpu installed.
+
+# Week 9 (optional): vision. One API, two deployment targets.
+# Local backend: a small model that co-resides with the text LLM on one 11 GB GPU,
+# enough to demo the whole system end to end.
+VISION_MODEL_LOCAL = "moondream"          # ~2 GB, fits alongside the Week 5 text model
+# Remote backend: a stronger model on a separate inference server (its own GPU),
+# reached over HTTP (a custom service, Triton, an OpenAI-compatible endpoint, ...).
+VISION_MODEL_REMOTE = "qwen2.5vl:7b"      # the better model you host elsewhere
+VISION_REMOTE_URL = "http://localhost:8000/vision"   # your remote endpoint
+VISION_REMOTE_TIMEOUT = 30                # seconds
+

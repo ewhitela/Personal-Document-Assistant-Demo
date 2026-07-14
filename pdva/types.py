@@ -1,3 +1,5 @@
+
+
 """Shared data types used across Weeks 4-6.
 
 These small dataclasses are the contract between modules. The DocumentIndex
@@ -38,3 +40,18 @@ class RAGAnswer:
     answer: str
     sources: list[Passage]
     prompt: str = ""
+
+
+@dataclass
+class TranscriptSegment:
+    """One timed span of transcribed speech (Week 7).
+
+    Attributes:
+        start: start time in seconds.
+        end:   end time in seconds.
+        text:  the words spoken in this span.
+    """
+    start: float
+    end: float
+    text: str
+

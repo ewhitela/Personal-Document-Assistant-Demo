@@ -231,3 +231,12 @@ class DocumentIndex:
             name=self.collection_name,
             metadata={"hnsw:space": "cosine"},
         )
+
+    def add_texts(self, texts: list[str], sources: list[str]) -> int:
+        """Index raw text strings directly, without needing files on disk.
+    
+        For each (text, source): chunk_text -> embed -> upsert with
+        make_chunk_id(source, i) and metadata {"source": source, "chunk": i}.
+        add_documents can call this after extract_text.
+        """
+        raise NotImplementedError
