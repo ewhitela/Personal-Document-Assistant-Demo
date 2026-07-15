@@ -30,9 +30,10 @@ import re
 import tempfile
 import os
 import wave
+import time
 
 try:
-    from piper import PiperVoice
+    from piper import PiperVoice, SynthesisConfig
 except ImportError:
     PiperVoice = None
 
@@ -42,6 +43,14 @@ import sounddevice as sd
 from . import config
 
 logger = logging.getLogger(__name__)
+
+_SYN_CONFIG = SynthesisConfig(
+    length_scale=1.05,
+    noise_scale=0.75,
+    noise_w_scale=0.85,
+    normalize_audio=True,
+)
+
 
 def split_sentences(text: str) -> list[str]:
     """Split text into sentence-sized pieces for smoother synthesis.
@@ -121,7 +130,7 @@ class Speaker:
             raise RuntimeError("Speaker voice is not loaded")
         
         with wave.open(out_path, "wb") as wav_file:
-            self.voice.synthesize_wav(text, wav_file)
+            self.voice.synthesize_wav(text, wav_file, syn_config=_SYN_CONFIG)
 
         return out_path
     
@@ -150,6 +159,7 @@ class Speaker:
                 data, sr = sf.read(out_path, dtype="float32")
                 sd.play(data, sr)
                 sd.wait()
+                time.sleep(0.45)
             finally:
                 os.remove(out_path)
 
