@@ -15,11 +15,21 @@ Run `python tests/test_week7_stt.py` after implementing. The integration check
 skips cleanly if the model is not available, so the file is always safe to run.
 """
 from __future__ import annotations
-from faster_whisper import WhisperModel
+
+import logging
+from pathlib import Path
+
+import time
+
+try:
+    from faster_whisper import WhisperModel
+except ImportError:
+    WhisperModel = None
 
 from .types import TranscriptSegment
 from . import config
 
+logger = logging.getLogger(__name__)
 
 def join_segments(segments) -> str:
     """Join transcript segments into one clean string.
@@ -61,13 +71,12 @@ class Transcriber:
         self.compute_type = compute_type
         self.model = None
         
-        if WhisperModel is None: 
+        if WhisperModel is None:
+            logger.warning("faster-whisper not installed; Transcriber disabled")
             return
         
-        try:
-            self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
-        except Exception:
-            self.model = None
+        self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
+
 
     def is_ready(self) -> bool:
         """Return True if a model is loaded and usable.
@@ -78,7 +87,7 @@ class Transcriber:
 
         return self.model is not None
 
-    def transcribe(self, audio_path: str) -> str:
+    def transcribe(self, audio_path: str, beam_size: int = 1, language: str | None = "en") -> str:
         """Transcribe an audio file to a single text string.
 
         Behavior:
@@ -91,15 +100,22 @@ class Transcriber:
         if not self.is_ready():
             raise RuntimeError("Transcriber model is not loaded")
         
-        segments, _info = self.model.transcribe(audio_path,beam_size=5)
+        if not Path(audio_path).exists():
+            raise FileNotFoundError(f"Audio file not found: {audio_path}")
         
-        joined_s = join_segments(segments)
+        start = time.time()
 
-        print(joined_s)
+        segments, info = self.model.transcribe(audio_path, beam_size=beam_size, language=language, vad_filter=True)
+        
+        print(f"took {time.time()-start}s to transcribe!")
 
-        return joined_s
+        joined = join_segments(segments)
+        logger.debug("transcribed (lang=%s): %s", info.language, joined)
 
-    def transcribe_segments(self, audio_path: str) -> list[TranscriptSegment]:
+        return joined
+
+
+    def transcribe_segments(self, audio_path: str, beam_size: int = 1) -> list[TranscriptSegment]:
         """Transcribe and return timed segments.
 
         Returns:
@@ -109,7 +125,13 @@ class Transcriber:
 
         if not self.is_ready():
             raise RuntimeError("Transcriber model is not loaded")
-        
-        segments, _info = self.model.transcribe(audio_path,beam_size=5)
+        if not Path(audio_path).exists():
+            raise FileNotFoundError(f"Audio file not found: {audio_path}")
+
+        start = time.time()
+
+        segments, _info = self.model.transcribe(audio_path, beam_size=beam_size)
+
+        print(f"took {time.time()-start}s to transcribe!")
 
         return [TranscriptSegment(start=s.start, end=s.end, text=s.text) for s in segments]

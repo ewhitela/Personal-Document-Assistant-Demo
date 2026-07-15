@@ -25,13 +25,23 @@ skips cleanly if Piper or the voice file is missing.
 """
 from __future__ import annotations
 
-from . import config
-from piper import PiperVoice
-
-import wave
-import soundfile as sf, sounddevice as sd
-import tempfile, os
+import logging
 import re
+import tempfile
+import os
+import wave
+
+try:
+    from piper import PiperVoice
+except ImportError:
+    PiperVoice = None
+
+import soundfile as sf
+import sounddevice as sd
+
+from . import config
+
+logger = logging.getLogger(__name__)
 
 def split_sentences(text: str) -> list[str]:
     """Split text into sentence-sized pieces for smoother synthesis.
@@ -49,7 +59,7 @@ def split_sentences(text: str) -> list[str]:
           block, and short pieces let playback start sooner.
     """
 
-    pieces = re.split(r'([.!?])', text)
+    pieces = re.split(r'([.!?]+)', text)
 
     sentences = []
     for i in range(0, len(pieces) - 1, 2):
@@ -76,9 +86,18 @@ class Speaker:
         sit next to it. use_cuda=True needs the onnxruntime-gpu package.
         """
 
-        self.voice = PiperVoice.load(voice_path,use_cuda=use_cuda)
         self.voice_path = voice_path
         self.use_cuda = use_cuda
+        self.voice = None
+
+        if PiperVoice is None:
+            logger.warning("piper-tts not installed; Speaker disabled")
+            return
+        try:
+            self.voice = PiperVoice.load(voice_path, use_cuda=use_cuda)
+        except Exception:
+            logger.exception("Failed to load Piper voice from %s", voice_path)
+            self.voice = None
 
     def is_ready(self) -> bool:
         """Return True if the voice model is loaded and the file exists.
@@ -98,6 +117,9 @@ class Speaker:
             can play or store it.
         """
 
+        if not self.is_ready():
+            raise RuntimeError("Speaker voice is not loaded")
+        
         with wave.open(out_path, "wb") as wav_file:
             self.voice.synthesize_wav(text, wav_file)
 
@@ -112,14 +134,22 @@ class Speaker:
             the voice loop uses; synthesize is the testable core it builds on.
         """
 
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-            out_path = tmp.name
+        if not self.is_ready():
+            raise RuntimeError("Speaker voice is not loaded")
+        
+        if not text.strip():
+            return
 
-        try:
-            self.synthesize(text, out_path)
-            data, sr = sf.read(out_path, dtype="float32")
-            sd.play(data, sr)
-            sd.wait()
-        finally:
-            os.remove(out_path)
+        sentences = split_sentences(text) or [text.strip()]
+
+        for sentence in sentences:
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+                out_path = tmp.name
+            try:
+                self.synthesize(sentence, out_path)
+                data, sr = sf.read(out_path, dtype="float32")
+                sd.play(data, sr)
+                sd.wait()
+            finally:
+                os.remove(out_path)
 
