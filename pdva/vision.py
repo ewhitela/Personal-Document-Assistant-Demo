@@ -27,11 +27,13 @@ Run `python tests/test_week9_vision.py` after implementing.
 """
 from __future__ import annotations
 
+import base64
 from abc import ABC, abstractmethod
 
 from . import config
 
 import ollama
+import requests
 
 
 # ---------------------------------------------------------------------------
@@ -44,8 +46,8 @@ def build_image_message(image_path: str, question: str) -> dict:
         {"role": "user", "content": question, "images": [image_path]}
     ollama accepts a file path or raw bytes in the images list.
     """
-    raise NotImplementedError
 
+    return {"role": "user", "content": question, "images": [image_path]}
 
 def encode_image_b64(image_path: str) -> str:
     """Read an image file and return its base64-encoded contents as ASCII text.
@@ -53,7 +55,9 @@ def encode_image_b64(image_path: str) -> str:
     Used by the remote backend, which must send image bytes over HTTP.
     Behavior: read the file in binary, base64-encode, decode to an ASCII str.
     """
-    raise NotImplementedError
+    
+    with open(image_path, "rb") as f:
+        return base64.b64encode(f.read()).decode("ascii")
 
 
 # ---------------------------------------------------------------------------
@@ -86,14 +90,19 @@ class OllamaVisionBackend(VisionBackend):
         self.host = host
         self.temperature = temperature
 
-        raise NotImplementedError
-
     def is_ready(self) -> bool:
-        """True only if the ollama server is reachable and self.model is pulled.
-        Return False (do not raise) on any connection error.
-        """
-
-        return self.model is not None
+        try:
+            resp = self.client.list()
+            models = resp.get("models", resp.models if hasattr(resp, "models") else [])
+            names = []
+            for m in models:
+                if isinstance(m, dict):
+                    names.append(m.get("name") or m.get("model", ""))
+                else:
+                    names.append(getattr(m, "model", "") or getattr(m, "name", ""))
+            return any(self.model in n for n in names)
+        except Exception:
+            return False
 
     def ask(self, image_path: str, question: str) -> str:
         """Send one image message to the model and return the reply text.
@@ -106,8 +115,11 @@ class OllamaVisionBackend(VisionBackend):
 
         msg = build_image_message(image_path, question); 
 
-        response = self.client.chat(model=self.model,messages=[msg],options={"temperature": self.temperature})
-
+        response = self.client.chat(
+            model=self.model,
+            messages=[msg],
+            options={"temperature": self.temperature},
+        )
         return response["message"]["content"]
 
 
@@ -127,7 +139,11 @@ class RemoteVisionBackend(VisionBackend):
         """Store the endpoint, model, timeout, and optional api_key on self.
         This is plain configuration; nothing to contact yet.
         """
-        raise NotImplementedError
+
+        self.endpoint = endpoint
+        self.model = model
+        self.timeout = timeout
+        self.api_key = api_key
 
     def build_payload(self, question: str, image_b64: str) -> dict:
         """Return the JSON body to POST. Override to match your server.
@@ -150,7 +166,14 @@ class RemoteVisionBackend(VisionBackend):
         Behavior: make a lightweight request (a health check, or a HEAD/GET on
         the endpoint) inside try/except and return False on any error.
         """
-        raise NotImplementedError
+        
+        headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+        try:
+            r = requests.get(self.endpoint, headers=headers, timeout=self.timeout)
+            return r.status_code < 500
+        except Exception:
+            return False
+
 
     def ask(self, image_path: str, question: str) -> str:
         """Answer a question about the image via the remote server.
@@ -162,8 +185,13 @@ class RemoteVisionBackend(VisionBackend):
             self.api_key is set), honour self.timeout, raise for HTTP errors,
             then return self.parse_response(response.json()).
         """
-        raise NotImplementedError
 
+        b64 = encode_image_b64(image_path)
+        payload = self.build_payload(question, b64)
+        headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+        r = requests.post(self.endpoint, json=payload, headers=headers, timeout=self.timeout)
+        r.raise_for_status()
+        return self.parse_response(r.json())
 
 # ---------------------------------------------------------------------------
 # Facade the rest of the system uses. Provided, not a stub.

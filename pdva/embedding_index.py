@@ -239,4 +239,20 @@ class DocumentIndex:
         make_chunk_id(source, i) and metadata {"source": source, "chunk": i}.
         add_documents can call this after extract_text.
         """
-        raise NotImplementedError
+
+        total = 0
+
+        for text, source in zip(texts, sources):
+            chunks = chunk_text(text)
+
+            if not chunks:
+                continue
+
+            ids   = [make_chunk_id(source, i) for i, _ in enumerate(chunks)]
+            metas = [{"source": source, "chunk": i} for i in range(len(chunks))]
+            embeddings = self.model.encode(chunks).tolist()
+
+            self.collection.upsert(ids=ids, documents=chunks, metadatas=metas, embeddings=embeddings)
+            total += len(chunks)
+
+        return total

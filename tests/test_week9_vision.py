@@ -69,6 +69,9 @@ def test_live_ask():
         print("   note: no tests/data/sample.png found; add one to exercise this.")
         return "skip"
     out = vm.ask(sample, "Describe this image in one sentence.")
+
+    print(f"Response: {out}")
+
     assert isinstance(out, str) and out.strip(), "ask should return non-empty text"
 
 
