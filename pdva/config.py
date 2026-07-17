@@ -33,7 +33,7 @@ RAG_TOP_K = 4
 # Week 7: speech-to-text (faster-whisper).
 WHISPER_MODEL = "base.en"     # tiny.en / base.en / small.en. ".en" is English-only and faster.
 WHISPER_DEVICE = "auto"       # "cuda" on the 1080Ti, "cpu" otherwise.
-WHISPER_COMPUTE = "auto"      # "float16" on GPU, "int8" on CPU.
+WHISPER_COMPUTE = "int8_float32"      # "float16" on GPU, "int8" on CPU.
 
 # Week 8: text-to-speech (Piper).
 # Download the voice first: python -m piper.download_voices en_US-lessac-medium

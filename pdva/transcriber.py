@@ -105,7 +105,7 @@ class Transcriber:
         
         start = time.time()
 
-        segments, info = self.model.transcribe(audio_path, beam_size=beam_size, language=language, vad_filter=True)
+        segments, info = self.model.transcribe(audio_path, beam_size=beam_size, language=language)
         
         print(f"took {time.time()-start}s to transcribe!")
 
