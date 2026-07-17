@@ -120,6 +120,7 @@ class OllamaVisionBackend(VisionBackend):
             messages=[msg],
             options={"temperature": self.temperature},
         )
+
         return response["message"]["content"]
 
 
@@ -151,6 +152,7 @@ class RemoteVisionBackend(VisionBackend):
         Default contract:
             {"model": <name>, "question": <text>, "image_b64": <base64 image>}
         """
+        
         return {"model": self.model, "question": question, "image_b64": image_b64}
 
     def parse_response(self, data: dict) -> str:
@@ -158,6 +160,7 @@ class RemoteVisionBackend(VisionBackend):
 
         Default: data["answer"].
         """
+
         return data["answer"]
 
     def is_ready(self) -> bool:
@@ -168,6 +171,7 @@ class RemoteVisionBackend(VisionBackend):
         """
         
         headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+
         try:
             r = requests.get(self.endpoint, headers=headers, timeout=self.timeout)
             return r.status_code < 500
@@ -189,8 +193,10 @@ class RemoteVisionBackend(VisionBackend):
         b64 = encode_image_b64(image_path)
         payload = self.build_payload(question, b64)
         headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+
         r = requests.post(self.endpoint, json=payload, headers=headers, timeout=self.timeout)
         r.raise_for_status()
+
         return self.parse_response(r.json())
 
 # ---------------------------------------------------------------------------
@@ -210,6 +216,7 @@ class VisionModel:
     def local(cls, model: str = config.VISION_MODEL_LOCAL,
               host: str = config.LLM_HOST) -> "VisionModel":
         """A VisionModel backed by a local ollama vision model."""
+        
         return cls(OllamaVisionBackend(model=model, host=host))
 
     @classmethod
@@ -217,6 +224,7 @@ class VisionModel:
                model: str = config.VISION_MODEL_REMOTE,
                api_key: str | None = None) -> "VisionModel":
         """A VisionModel backed by a remote HTTP vision server."""
+
         return cls(RemoteVisionBackend(endpoint=endpoint, model=model, api_key=api_key))
 
     def is_ready(self) -> bool:
