@@ -33,12 +33,11 @@ class LocalLLM:
     """
 
     DEFAULT_SYSTEM = (
-        "You are a precise assistant. Answer using ONLY the provided context.\n"
-        "- If the context fully answers the question, answer it directly.\n"
-        "- If the context is partially relevant, answer what you can and state "
-        "explicitly what information is missing. Do not guess the rest.\n"
-        "- If the context contains nothing relevant, reply exactly: "
-        "\"I don't know based on your documents.\" and nothing else."
+        "You are a precise assistant for a personal document collection. "
+        "Answer the question using ONLY the context passages provided, directly "
+        "and completely in 2-4 sentences, including the key specifics from the "
+        "context. If the context does not contain the answer, reply exactly: "
+        "\"I don't know based on your documents.\""
     )
 
     def __init__(self,
@@ -107,7 +106,7 @@ class LocalLLM:
         response = self.client.chat(
             model=self.model,
             messages=messages,
-            options={"temperature": self.temperature}
+            options={"temperature": self.temperature, "num_predict": 220}
         )
 
         return response.message.content
@@ -126,7 +125,7 @@ class LocalLLM:
         for chunk in self.client.chat(
             model=self.model,
             messages=messages,
-            options={"temperature": self.temperature},
+            options={"temperature": self.temperature, "num_predict": 220},
             stream=True
         ):
             yield chunk.message.content

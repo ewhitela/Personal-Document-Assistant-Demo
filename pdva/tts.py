@@ -36,6 +36,7 @@ try:
     from piper import PiperVoice, SynthesisConfig
 except ImportError:
     PiperVoice = None
+    SynthesisConfig = None
 
 import soundfile as sf
 import sounddevice as sd
@@ -49,7 +50,7 @@ _SYN_CONFIG = SynthesisConfig(
     noise_scale=0.75,
     noise_w_scale=0.85,
     normalize_audio=True,
-)
+) if SynthesisConfig else None
 
 
 def split_sentences(text: str) -> list[str]:

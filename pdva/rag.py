@@ -25,11 +25,10 @@ class RAGPipeline:
 
     SYSTEM_PROMPT = (
         "You are a precise assistant for a personal document collection. "
-        "Answer the question using ONLY the context passages provided. If the "
-        "context does not contain the answer, reply exactly: "
-        "\"I don't know based on your documents.\" After the answer, list the "
-        "source filenames you used and briefly note what part of each source "
-        "supports your answer."
+        "Answer the question using ONLY the context passages provided, directly "
+        "and completely in 2-4 sentences, including the key specifics from the "
+        "context. If the context does not contain the answer, reply exactly: "
+        "\"I don't know based on your documents.\""
     )
 
     def __init__(self, index: DocumentIndex, llm: LocalLLM,

@@ -18,12 +18,39 @@ from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 import chromadb
 import os
+import re
+
+URL_RE = re.compile(r"https?://\S+|\(\s*https?[^)]*\)?")
+FOOTNOTE_RE = re.compile(r"\[\d+\]")
+CUTOFF_HEADINGS = re.compile(
+    r"^\s*(References|External links|Further reading|See also|Bibliography|Notes)\s*$",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def clean_text(text: str) -> str:
+    """Strip citation noise from extracted text before chunking."""
+    m = CUTOFF_HEADINGS.search(text)
+    if m:
+        text = text[: m.start()]
+    text = URL_RE.sub(" ", text)
+    text = FOOTNOTE_RE.sub("", text)
+    return text
+
+
+def is_content_chunk(chunk: str) -> bool:
+    """Reject chunks that are mostly citations: high digit/punctuation density."""
+    words = chunk.split()
+    if len(words) < 20:
+        return False
+    numeric = sum(1 for w in words if any(c.isdigit() for c in w))
+    return numeric / len(words) < 0.35
+
 
 # ---------------------------------------------------------------------------
 # Module-level helpers. Implement these first; the class uses them.
 # ---------------------------------------------------------------------------
 def extract_text(path: str) -> str:
-
     """
     Read a document and return its plain text.
 
@@ -51,9 +78,9 @@ def extract_text(path: str) -> str:
         raise ValueError(f"Unsupported file type: {ext}")
 
 
-def chunk_text(text: str,
-               chunk_size: int = config.CHUNK_SIZE,
-               overlap: int = config.CHUNK_OVERLAP) -> list[str]:
+def chunk_text(
+    text: str, chunk_size: int = config.CHUNK_SIZE, overlap: int = config.CHUNK_OVERLAP
+) -> list[str]:
     """Split text into overlapping chunks.
 
     Args:
@@ -75,7 +102,9 @@ def chunk_text(text: str,
     """
 
     if not 0 <= overlap < chunk_size:
-        raise ValueError(f"overlap must satisfy 0 <= overlap < chunk_size, got overlap={overlap}, chunk_size={chunk_size}")
+        raise ValueError(
+            f"overlap must satisfy 0 <= overlap < chunk_size, got overlap={overlap}, chunk_size={chunk_size}"
+        )
 
     words = text.split()
     if not words:
@@ -84,13 +113,11 @@ def chunk_text(text: str,
     step = chunk_size - overlap
     chunks = []
     for i in range(0, len(words), step):
-        chunk = " ".join(words[i:i + chunk_size])
+        chunk = " ".join(words[i : i + chunk_size])
         if chunk:
             chunks.append(chunk)
 
     return chunks
-
-    
 
 
 def make_chunk_id(source: str, index: int) -> str:
@@ -103,8 +130,6 @@ def make_chunk_id(source: str, index: int) -> str:
 
     return f"{source}::chunk_{index}"
 
-    
-
 
 # ---------------------------------------------------------------------------
 # The index itself.
@@ -116,10 +141,12 @@ class DocumentIndex:
     it feeds to the LLM. The index must survive a process restart.
     """
 
-    def __init__(self,
-                 persist_dir: str = config.PERSIST_DIR,
-                 embedding_model: str = config.EMBEDDING_MODEL,
-                 collection_name: str = config.COLLECTION_NAME) -> None:
+    def __init__(
+        self,
+        persist_dir: str = config.PERSIST_DIR,
+        embedding_model: str = config.EMBEDDING_MODEL,
+        collection_name: str = config.COLLECTION_NAME,
+    ) -> None:
         """Open or create a persistent vector store.
 
         Behavior:
@@ -136,7 +163,7 @@ class DocumentIndex:
         """
 
         self.client = chromadb.PersistentClient(path=persist_dir)
-        
+
         self.collection = self.client.get_or_create_collection(
             name=collection_name,
             metadata={"hnsw:space": "cosine"},
@@ -168,17 +195,19 @@ class DocumentIndex:
         for path in paths:
             filename = os.path.basename(path)
 
-            text   = extract_text(path)
-            chunks = chunk_text(text)
+            text = extract_text(path)
+            chunks = [c for c in chunk_text(text) if is_content_chunk(c)]
 
             if not chunks:
                 continue
 
-            ids    = [make_chunk_id(filename, i) for i, _ in enumerate(chunks)]
-            metas  = [{"source": filename, "chunk": i} for i in range(len(chunks))]
+            ids = [make_chunk_id(filename, i) for i, _ in enumerate(chunks)]
+            metas = [{"source": filename, "chunk": i} for i in range(len(chunks))]
             embeddings = self.model.encode(chunks).tolist()
 
-            self.collection.upsert(ids=ids, documents=chunks, metadatas=metas, embeddings=embeddings)
+            self.collection.upsert(
+                ids=ids, documents=chunks, metadatas=metas, embeddings=embeddings
+            )
             total += len(chunks)
 
         return total
@@ -208,21 +237,23 @@ class DocumentIndex:
         dists = results["distances"][0]
 
         for doc, meta, dist in zip(docs, metas, dists):
-            passages.append(Passage(
-                text=doc,
-                source=meta["source"],
-                score=1.0 - dist,
-                chunk_id=make_chunk_id(meta["source"], meta["chunk"]),
-                metadata=meta,
-            ))
+            passages.append(
+                Passage(
+                    text=doc,
+                    source=meta["source"],
+                    score=1.0 - dist,
+                    chunk_id=make_chunk_id(meta["source"], meta["chunk"]),
+                    metadata=meta,
+                )
+            )
 
         return passages
 
     def count(self) -> int:
         """Return how many chunks are currently stored."""
-        
+
         return self.collection.count()
-    
+
     def reset(self) -> None:
         """Remove all chunks from the collection (used by tests and re-builds)."""
 
@@ -234,7 +265,7 @@ class DocumentIndex:
 
     def add_texts(self, texts: list[str], sources: list[str]) -> int:
         """Index raw text strings directly, without needing files on disk.
-    
+
         For each (text, source): chunk_text -> embed -> upsert with
         make_chunk_id(source, i) and metadata {"source": source, "chunk": i}.
         add_documents can call this after extract_text.
@@ -243,16 +274,18 @@ class DocumentIndex:
         total = 0
 
         for text, source in zip(texts, sources):
-            chunks = chunk_text(text)
+            chunks = [c for c in chunk_text(text) if is_content_chunk(c)]
 
             if not chunks:
                 continue
 
-            ids   = [make_chunk_id(source, i) for i, _ in enumerate(chunks)]
+            ids = [make_chunk_id(source, i) for i, _ in enumerate(chunks)]
             metas = [{"source": source, "chunk": i} for i in range(len(chunks))]
             embeddings = self.model.encode(chunks).tolist()
 
-            self.collection.upsert(ids=ids, documents=chunks, metadatas=metas, embeddings=embeddings)
+            self.collection.upsert(
+                ids=ids, documents=chunks, metadatas=metas, embeddings=embeddings
+            )
             total += len(chunks)
 
         return total

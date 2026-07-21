@@ -23,17 +23,17 @@ CHUNK_SIZE = 200
 CHUNK_OVERLAP = 30                     # words shared between neighbouring chunks (~15%)
 
 # Week 5: which local model to call, where the ollama server is, how random.
-LLM_MODEL = "llama3.1:8b"              # must be pulled first: `ollama pull llama3.1:8b`
+LLM_MODEL = "llama3.2:3b"              # must be pulled first: `ollama pull llama3.1:8b`
 LLM_HOST = "http://localhost:11434"
 LLM_TEMPERATURE = 0.2                  # low = more deterministic, good for grounded Q&A
 
 # Week 6: how many passages to retrieve per question.
-RAG_TOP_K = 4
+RAG_TOP_K = 3
 
 # Week 7: speech-to-text (faster-whisper).
 WHISPER_MODEL = "base.en"     # tiny.en / base.en / small.en. ".en" is English-only and faster.
-WHISPER_DEVICE = "auto"       # "cuda" on the 1080Ti, "cpu" otherwise.
-WHISPER_COMPUTE = "int8_float32"      # "float16" on GPU, "int8" on CPU.
+WHISPER_DEVICE = "cpu"
+WHISPER_COMPUTE = "int8"
 
 # Week 8: text-to-speech (Piper).
 # Download the voice first: python -m piper.download_voices en_US-lessac-medium
@@ -50,3 +50,6 @@ VISION_MODEL_REMOTE = "qwen2.5vl:7b"      # the better model you host elsewhere
 VISION_REMOTE_URL = "http://localhost:8000/vision"   # your remote endpoint
 VISION_REMOTE_TIMEOUT = 30                # seconds
 
+# OWW Model
+
+OPENWAKEWORD_MODEL = "jarona.onnx"
