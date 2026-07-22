@@ -106,7 +106,8 @@ class LocalLLM:
         response = self.client.chat(
             model=self.model,
             messages=messages,
-            options={"temperature": self.temperature, "num_predict": 220}
+            options={"temperature": self.temperature, "num_predict": 220},
+            keep_alive=-1,
         )
 
         return response.message.content

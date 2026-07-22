@@ -41,8 +41,7 @@ def clean_text(text: str) -> str:
 def is_content_chunk(chunk: str) -> bool:
     """Reject chunks that are mostly citations: high digit/punctuation density."""
     words = chunk.split()
-    if len(words) < 20:
-        return False
+
     numeric = sum(1 for w in words if any(c.isdigit() for c in w))
     return numeric / len(words) < 0.35
 
@@ -70,12 +69,14 @@ def extract_text(path: str) -> str:
 
     if ext == ".pdf":
         reader = PdfReader(path)
-        return "\n".join((page.extract_text() or "") for page in reader.pages)
-    elif ext == ".md" or ext == ".txt":
+        return clean_text("\n".join((page.extract_text() or "") for page in reader.pages))
+    elif ext in (".md", ".txt"):
         with open(path, encoding="utf-8") as f:
-            return f.read()
+            return clean_text(f.read())
     else:
         raise ValueError(f"Unsupported file type: {ext}")
+    
+
 
 
 def chunk_text(

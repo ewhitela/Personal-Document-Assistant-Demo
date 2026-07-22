@@ -103,12 +103,8 @@ class Transcriber:
         if not Path(audio_path).exists():
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
         
-        start = time.time()
-
         segments, info = self.model.transcribe(audio_path, beam_size=beam_size, language=language)
         
-        print(f"took {time.time()-start}s to transcribe!")
-
         joined = join_segments(segments)
         logger.debug("transcribed (lang=%s): %s", info.language, joined)
 
@@ -128,10 +124,6 @@ class Transcriber:
         if not Path(audio_path).exists():
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
-        start = time.time()
-
         segments, _info = self.model.transcribe(audio_path, beam_size=beam_size)
-
-        print(f"took {time.time()-start}s to transcribe!")
 
         return [TranscriptSegment(start=s.start, end=s.end, text=s.text) for s in segments]

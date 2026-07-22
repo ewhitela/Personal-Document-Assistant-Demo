@@ -1,6 +1,4 @@
-
-
-# Personal Document Voice Assistant (PDVA) starter kit, Weeks 4 to 9
+# Personal Document Voice Assistant (PDVA), Weeks 4 to 10
 
 # Week 4: document embedding and retrieval
 sentence-transformers
@@ -9,7 +7,8 @@ pypdf
 # pymupdf            # optional, faster/more robust PDF text extraction than pypdf
 
 # Week 5: local LLM inference
-ollama               # python client; also install the ollama app from https://ollama.com
+ollama               # python client; also install the ollama app from https://ollama.com,
+                     # then: ollama pull llama3.2:3b
 
 # Week 7: speech-to-text
 faster-whisper
@@ -18,8 +17,18 @@ soundfile
 
 # Week 8: text-to-speech
 piper-tts            # OHF-Voice/piper1-gpl; then: python -m piper.download_voices en_US-lessac-medium
+                     # the .onnx and .onnx.json voice files must sit in the project root
 
 # Week 9 (optional): vision. Local backend uses the ollama client above.
 # Remote backend (a stronger model on another server) uses HTTP:
 requests
 
+# Week 10: integration service and UI
+fastapi
+uvicorn
+python-multipart     # multipart uploads (documents, audio) in FastAPI
+streamlit            # >=1.39 required for st.audio_input (voice recording)
+
+# Voice loop (demo_voice.py): wake word + VAD
+openwakeword
+webrtcvad-wheels     # not `webrtcvad` — no prebuilt wheels for Python 3.11
