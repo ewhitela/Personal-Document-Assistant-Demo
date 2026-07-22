@@ -1,0 +1,54 @@
+[project]
+name = "pdva"
+version = "1.0.0"
+description = "Personal Document Voice Assistant: local, private, voice-driven document Q&A"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = { text = "MIT" }
+
+dependencies = [
+    # Week 4: document embedding and retrieval
+    "sentence-transformers>=2.7",
+    "chromadb>=0.5",
+    "pypdf>=4.0",
+    # Week 5: local LLM inference (also install the ollama app, then: ollama pull llama3.2:3b)
+    "ollama>=0.3",
+    # Week 7: speech-to-text
+    "faster-whisper>=1.0",
+    "sounddevice>=0.4",
+    "soundfile>=0.12",
+    # Week 8: text-to-speech (then: python -m piper.download_voices en_US-lessac-medium)
+    "piper-tts>=1.2",
+    # Week 9 (optional): remote vision backend
+    "requests>=2.31",
+    # Week 10: integration service and UI
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "python-multipart>=0.0.9",
+    "streamlit>=1.39",          # st.audio_input needs >=1.39
+]
+
+[project.optional-dependencies]
+# Wake-word voice loop (demo_voice.py); CPU-only onnxruntime path
+voice = [
+    "openwakeword>=0.6",
+    "webrtcvad-wheels>=2.0",    # not `webrtcvad`: no py3.11 prebuilt wheels
+]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",              # fastapi TestClient
+]
+
+[tool.uv]
+# Keep resolution deterministic per platform; uv.lock is committed.
+# CUDA note: torch arrives transitively via sentence-transformers. On the
+# workstation the default PyPI wheels (CUDA-bundled on Linux) are fine; on
+# macOS uv resolves CPU/MPS wheels automatically. No CUDA index pinning is
+# required because STT/TTS run on CPU and the LLM lives in ollama.
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pdva"]

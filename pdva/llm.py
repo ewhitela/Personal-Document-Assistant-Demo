@@ -38,6 +38,7 @@ class LocalLLM:
         "and completely in 2-4 sentences, including the key specifics from the "
         "context. If the context does not contain the answer, reply exactly: "
         "\"I don't know based on your documents.\""
+        "If the context only partially answers, give the partial answer plainly without describing what the context lacks."
     )
 
     def __init__(self,

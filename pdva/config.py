@@ -23,7 +23,7 @@ CHUNK_SIZE = 200
 CHUNK_OVERLAP = 30                     # words shared between neighbouring chunks (~15%)
 
 # Week 5: which local model to call, where the ollama server is, how random.
-LLM_MODEL = "llama3.2:3b"              # must be pulled first: `ollama pull llama3.1:8b`
+LLM_MODEL = "llama3.2:3b"              # must be pulled first: `ollama pull llama3.2:3b`
 LLM_HOST = "http://localhost:11434"
 LLM_TEMPERATURE = 0.2                  # low = more deterministic, good for grounded Q&A
 
@@ -51,5 +51,7 @@ VISION_REMOTE_URL = "http://localhost:8000/vision"   # your remote endpoint
 VISION_REMOTE_TIMEOUT = 30                # seconds
 
 # OWW Model
+# Wake word (demo_voice.py): custom openWakeWord model, filename stem keys the
+# prediction dict. Runs on CPU (onnxruntime).
 
 OPENWAKEWORD_MODEL = "jarona.onnx"

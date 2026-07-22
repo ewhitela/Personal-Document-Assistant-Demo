@@ -1,6 +1,6 @@
 """Week 10: Streamlit UI for the PDVA service.
 
-Thin HTTP client of service/app.py — no model code here. Start the service
+Thin HTTP client of service/app.py, no model code here. Start the service
 first, then:
 
     streamlit run ui/streamlit_app.py
