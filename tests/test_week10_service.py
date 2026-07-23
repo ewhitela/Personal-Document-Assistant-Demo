@@ -77,7 +77,6 @@ class FakeSpeaker:
         return out_path
 
 
-@pytest.fixture()
 def client(tmp_path, monkeypatch):
     from service import app as app_module
     monkeypatch.setattr(app_module, "DOCS_DIR", tmp_path)

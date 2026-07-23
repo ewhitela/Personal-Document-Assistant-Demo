@@ -33,7 +33,7 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import Response
 from pydantic import BaseModel
 
@@ -42,9 +42,7 @@ logger = logging.getLogger("pdva.service")
 DOCS_DIR = Path(os.environ.get("PDVA_DOCS_DIR", "pdva_docs")).resolve()
 SUPPORTED_DOCS = {".txt", ".md", ".pdf"}
 SUPPORTED_AUDIO = {".wav", ".mp3", ".m4a", ".flac", ".ogg", ".webm"}
-
-
-# Component container. Real components are built in build_components();
+SUPPORTED_IMAGES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
 
 @dataclass
 class Components:
@@ -53,11 +51,12 @@ class Components:
     pipeline: object
     transcriber: object | None = None
     speaker: object | None = None
+    vision: object | None = None
 
 
 def build_components() -> Components:
     """Load every model once. Import pdva lazily so this module stays cheap."""
-    from pdva import DocumentIndex, LocalLLM, RAGPipeline, Speaker, Transcriber
+    from pdva import DocumentIndex, LocalLLM, RAGPipeline, Speaker, Transcriber, VisionModel
 
     index = DocumentIndex()
     llm = LocalLLM()
@@ -80,8 +79,16 @@ def build_components() -> Components:
     except Exception:
         logger.exception("Speaker failed to load; /speak disabled")
 
+    vision = None
+    try:
+        v = VisionModel.local()
+        if v.is_ready():
+            vision = v
+    except Exception:
+        logger.exception("Vision failed to load; /vision/ask disabled")
+
     return Components(index=index, llm=llm, pipeline=pipeline,
-                      transcriber=transcriber, speaker=speaker)
+                      transcriber=transcriber, speaker=speaker,vision=vision)
 
 
 def reindex_docs_dir(comp: Components) -> int:
@@ -178,6 +185,7 @@ def create_app(components: Components | None = None) -> FastAPI:
             "stt_ready": c.transcriber is not None,
             "tts_ready": c.speaker is not None,
             "indexed_chunks": c.index.count(),
+            "vision_ready": c.vision is not None,
         }
 
     @app.get("/documents")
@@ -287,6 +295,37 @@ def create_app(components: Components | None = None) -> FastAPI:
         body["transcript"] = transcript
         body["timings"] = timings
 
+        return body
+
+    @app.post("/vision/ask")
+    def vision_ask(image: UploadFile = File(...), question: str = Form(""),
+                   speak: bool = False):
+        c = comp()
+        if c.vision is None:
+            raise HTTPException(503, "Vision not available (moondream not loaded)")
+
+        suffix = Path(image.filename or "img.png").suffix.lower() or ".png"
+        if suffix not in SUPPORTED_IMAGES:
+            raise HTTPException(400, f"Unsupported image type: {suffix}")
+
+        fd, path = tempfile.mkstemp(suffix=suffix)
+        os.close(fd)
+        try:
+            with open(path, "wb") as out:
+                shutil.copyfileobj(image.file, out)
+            t0 = time.perf_counter()
+            q = question.strip()
+            answer = c.vision.ask(path, q) if q else c.vision.describe(path)
+            vision_s = round(time.perf_counter() - t0, 3)
+        finally:
+            os.remove(path)
+
+        body = {"answer": answer, "sources": []}
+        timings = {"vision_s": vision_s}
+        if speak:
+            body["audio_b64"], timings["tts_s"] = synthesize_b64(answer)
+        timings["total_s"] = round(sum(timings.values()), 3)
+        body["timings"] = timings
         return body
 
     # -- speak -------------------------------------------------------------

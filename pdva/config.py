@@ -20,7 +20,7 @@ EMBEDDING_MODEL = "all-MiniLM-L6-v2"   # try "BAAI/bge-small-en-v1.5" later
 # chunks are not silently truncated. If you switch to a 512-token model you can
 # raise this. The precise approach is to chunk by tokens with the model tokenizer.
 CHUNK_SIZE = 200
-CHUNK_OVERLAP = 30                     # words shared between neighbouring chunks (~15%)
+CHUNK_OVERLAP = 50                     # words shared between neighbouring chunks (~15%)
 
 # Week 5: which local model to call, where the ollama server is, how random.
 LLM_MODEL = "llama3.2:3b"              # must be pulled first: `ollama pull llama3.2:3b`
@@ -28,7 +28,7 @@ LLM_HOST = "http://localhost:11434"
 LLM_TEMPERATURE = 0.2                  # low = more deterministic, good for grounded Q&A
 
 # Week 6: how many passages to retrieve per question.
-RAG_TOP_K = 3
+RAG_TOP_K = 7
 
 # Week 7: speech-to-text (faster-whisper).
 WHISPER_MODEL = "base.en"     # tiny.en / base.en / small.en. ".en" is English-only and faster.

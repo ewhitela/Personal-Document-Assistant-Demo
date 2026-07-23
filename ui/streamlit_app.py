@@ -73,7 +73,8 @@ with st.sidebar:
         st.write(
             f"LLM {'✅' if h['llm_ready'] else '❌'} · "
             f"STT {'✅' if h['stt_ready'] else '❌'} · "
-            f"TTS {'✅' if h['tts_ready'] else '❌'}"
+            f"TTS {'✅' if h['tts_ready'] else '❌'} · "
+            f"Vision {'✅' if h.get('vision_ready') else '❌'}"
         )
         
         st.caption(f"{h['indexed_chunks']} chunks indexed")
@@ -122,7 +123,7 @@ with st.sidebar:
 if not service_up:
     st.stop()
 
-voice_tab, text_tab = st.tabs(["🎤 Voice", "⌨️ Text"])
+voice_tab, text_tab, image_tab = st.tabs(["🎤 Voice", "⌨️ Text", "🖼️ Image"])
 
 with voice_tab:
     recording = st.audio_input("Record your question")
@@ -144,4 +145,21 @@ with text_tab:
         with st.spinner("Answering…"):
             body = api("POST", "/ask", json={"question": question, "speak": speak_answers}).json()
             
+        show_result(body)
+
+with image_tab:
+    img = st.file_uploader("Image", type=["png", "jpg", "jpeg", "webp"],
+                           key="vision_img")
+    vq = st.text_input("Question about the image (blank = describe)",
+                       key="vision_q")
+
+    if img is not None and st.button("Ask", key="ask_vision", type="primary"):
+        st.image(img)
+        with st.spinner("Looking…"):
+            body = api(
+                "POST", "/vision/ask",
+                params={"speak": str(speak_answers).lower()},
+                data={"question": vq},
+                files={"image": (img.name, img.getvalue(), img.type)},
+            ).json()
         show_result(body)
