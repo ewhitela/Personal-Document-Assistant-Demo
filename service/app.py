@@ -37,6 +37,10 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import Response
 from pydantic import BaseModel
 
+from pdva.assistant import Assistant
+from pdva.verifier import VerifiedRAGPipeline
+from pdva.verifier import verify
+
 logger = logging.getLogger("pdva.service")
 
 DOCS_DIR = Path(os.environ.get("PDVA_DOCS_DIR", "pdva_docs")).resolve()
@@ -46,12 +50,11 @@ SUPPORTED_IMAGES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
 
 @dataclass
 class Components:
+    # `index` stays separate: Assistant has no reference to it (it only holds
+    # the rag pipeline, transcriber, speaker, vision), but the /documents
+    # endpoints need to add/reset/count chunks directly.
     index: object
-    llm: object
-    pipeline: object
-    transcriber: object | None = None
-    speaker: object | None = None
-    vision: object | None = None
+    assistant: Assistant
 
 
 def build_components() -> Components:
@@ -60,7 +63,7 @@ def build_components() -> Components:
 
     index = DocumentIndex()
     llm = LocalLLM()
-    pipeline = RAGPipeline(index, llm)
+    pipeline = VerifiedRAGPipeline(RAGPipeline(index, llm))
 
     transcriber = None
     try:
@@ -71,7 +74,6 @@ def build_components() -> Components:
         logger.exception("Transcriber failed to load; /voice/ask disabled")
 
     speaker = None
-    
     try:
         s = Speaker()
         if s.is_ready():
@@ -87,8 +89,8 @@ def build_components() -> Components:
     except Exception:
         logger.exception("Vision failed to load; /vision/ask disabled")
 
-    return Components(index=index, llm=llm, pipeline=pipeline,
-                      transcriber=transcriber, speaker=speaker,vision=vision)
+    assistant = Assistant(transcriber=transcriber, rag=pipeline, speaker=speaker, vision=vision)
+    return Components(index=index, assistant=assistant)
 
 
 def reindex_docs_dir(comp: Components) -> int:
@@ -102,7 +104,7 @@ def reindex_docs_dir(comp: Components) -> int:
 
     paths = sorted(str(p) for p in DOCS_DIR.iterdir()
                    if p.suffix.lower() in SUPPORTED_DOCS)
-    
+
     return comp.index.add_documents(paths) if paths else 0
 
 
@@ -139,37 +141,59 @@ def create_app(components: Components | None = None) -> FastAPI:
         return app.state.comp
 
     def answer_with_timings(question: str) -> tuple[dict, dict]:
+        """Retrieve + generate, timed as two stages.
+
+        This goes through assistant.rag (the RAGPipeline) rather than
+        assistant.answer_text(), because answer_text() returns a single
+        RAGAnswer with no internal timing split, and retrieve_s/generate_s
+        are graded separately in the Week 12 latency breakdown. Both
+        assistant.rag and assistant.rag.llm are the same objects
+        answer_text() would use internally -- this is still "going through
+        the assistant", just at the stage-level instead of the single
+        convenience call.
+        """
         c = comp()
+        rag = c.assistant.rag
+
         t0 = time.perf_counter()
-        passages = c.index.search(question, c.pipeline.k)
+        passages = c.index.search(question, rag.k)
 
         t1 = time.perf_counter()
-        prompt = c.pipeline.build_prompt(question, passages)
-        text = c.llm.generate(prompt, system=c.pipeline.SYSTEM_PROMPT)
+        prompt = rag.build_prompt(question, passages)
+        text = rag.llm.generate(prompt, system=rag.SYSTEM_PROMPT)
 
         t2 = time.perf_counter()
+        text, report = verify(text, passages, question)
+        t3 = time.perf_counter()
 
         timings = {"retrieve_s": round(t1 - t0, 3),
-                   "generate_s": round(t2 - t1, 3)}
-        
+                   "generate_s": round(t2 - t1, 3),
+                   "verify_s": round(t3 - t2, 3)}
+
         body = {"answer": text,
-                "sources": [_passage_dict(p) for p in passages]}
-        
+                "sources": [_passage_dict(p) for p in passages],
+                "verification": {"passed": report.passed,
+                                 "abstained": report.abstained,
+                                 "ungrounded_numbers": report.ungrounded,
+                                 "ungrounded_entities": report.ungrounded_entities,
+                                 "status_stripped": report.status_stripped}}
+
         return body, timings
 
     def synthesize_b64(text: str) -> tuple[str, float]:
         c = comp()
+        speaker = c.assistant.speaker
 
-        if c.speaker is None:
+        if speaker is None:
             raise HTTPException(503, "TTS not available (Piper voice not loaded)")
-        
+
         t0 = time.perf_counter()
         fd, path = tempfile.mkstemp(suffix=".wav")
 
         os.close(fd)
 
         try:
-            c.speaker.synthesize(text, path)
+            speaker.synthesize(text, path)
             data = Path(path).read_bytes()
         finally:
             os.remove(path)
@@ -179,20 +203,21 @@ def create_app(components: Components | None = None) -> FastAPI:
     @app.get("/health")
     def health():
         c = comp()
+        ready = c.assistant.ready()
 
         return {
-            "llm_ready": bool(c.llm.is_ready()),
-            "stt_ready": c.transcriber is not None,
-            "tts_ready": c.speaker is not None,
+            "llm_ready": ready["llm"],
+            "stt_ready": ready["stt"],
+            "tts_ready": ready["tts"],
+            "vision_ready": ready["vision"],
             "indexed_chunks": c.index.count(),
-            "vision_ready": c.vision is not None,
         }
 
     @app.get("/documents")
     def list_documents():
         files = sorted(p.name for p in DOCS_DIR.iterdir()
                        if p.suffix.lower() in SUPPORTED_DOCS)
-        
+
         return {"documents": files, "chunks": comp().index.count()}
 
     @app.post("/documents")
@@ -201,18 +226,18 @@ def create_app(components: Components | None = None) -> FastAPI:
 
         for f in files:
             name = Path(f.filename or "").name
-            
+
             if not name or Path(name).suffix.lower() not in SUPPORTED_DOCS:
                 raise HTTPException(400, f"Unsupported file type: {f.filename!r} "
                                          f"(supported: {sorted(SUPPORTED_DOCS)})")
-            
+
             dest = DOCS_DIR / name
-            
+
             with dest.open("wb") as out:
                 shutil.copyfileobj(f.file, out)
-            
+
             saved.append(str(dest))
-       
+
         t0 = time.perf_counter()
         chunks = comp().index.add_documents(saved)
 
@@ -226,7 +251,7 @@ def create_app(components: Components | None = None) -> FastAPI:
 
         if not target.exists():
             raise HTTPException(404, f"Not indexed: {filename}")
-        
+
         target.unlink()
         chunks = reindex_docs_dir(comp())
 
@@ -246,7 +271,7 @@ def create_app(components: Components | None = None) -> FastAPI:
     def ask(req: AskRequest):
         if not req.question.strip():
             raise HTTPException(400, "Empty question")
-        
+
         body, timings = answer_with_timings(req.question)
 
         if req.speak:
@@ -260,15 +285,16 @@ def create_app(components: Components | None = None) -> FastAPI:
     @app.post("/voice/ask")
     def voice_ask(audio: UploadFile = File(...), speak: bool = False):
         c = comp()
+        transcriber = c.assistant.transcriber
 
-        if c.transcriber is None:
+        if transcriber is None:
             raise HTTPException(503, "STT not available (whisper model not loaded)")
-        
+
         suffix = Path(audio.filename or "q.wav").suffix.lower() or ".wav"
 
         if suffix not in SUPPORTED_AUDIO:
             raise HTTPException(400, f"Unsupported audio type: {suffix}")
-        
+
         fd, path = tempfile.mkstemp(suffix=suffix)
         os.close(fd)
 
@@ -276,7 +302,7 @@ def create_app(components: Components | None = None) -> FastAPI:
             with open(path, "wb") as out:
                 shutil.copyfileobj(audio.file, out)
             t0 = time.perf_counter()
-            transcript = c.transcriber.transcribe(path)
+            transcript = transcriber.transcribe(path)
             stt_s = round(time.perf_counter() - t0, 3)
         finally:
             os.remove(path)
@@ -284,7 +310,7 @@ def create_app(components: Components | None = None) -> FastAPI:
         if not transcript.strip():
             return {"transcript": "", "answer": "", "sources": [],
                     "timings": {"stt_s": stt_s, "total_s": stt_s}}
-        
+
         body, timings = answer_with_timings(transcript)
         timings = {"stt_s": stt_s, **timings}
 
@@ -301,7 +327,7 @@ def create_app(components: Components | None = None) -> FastAPI:
     def vision_ask(image: UploadFile = File(...), question: str = Form(""),
                    speak: bool = False):
         c = comp()
-        if c.vision is None:
+        if c.assistant.vision is None:
             raise HTTPException(503, "Vision not available (moondream not loaded)")
 
         suffix = Path(image.filename or "img.png").suffix.lower() or ".png"
@@ -311,11 +337,12 @@ def create_app(components: Components | None = None) -> FastAPI:
         fd, path = tempfile.mkstemp(suffix=suffix)
         os.close(fd)
         try:
-            with open(path, "wb") as out:
-                shutil.copyfileobj(image.file, out)
             t0 = time.perf_counter()
             q = question.strip()
-            answer = c.vision.ask(path, q) if q else c.vision.describe(path)
+            if q:
+                answer = c.assistant.answer_about_image(path, q)
+            else:
+                answer = c.assistant.vision.describe(path)
             vision_s = round(time.perf_counter() - t0, 3)
         finally:
             os.remove(path)
@@ -333,7 +360,7 @@ def create_app(components: Components | None = None) -> FastAPI:
     def speak(req: SpeakRequest):
         if not req.text.strip():
             raise HTTPException(400, "Empty text")
-        
+
         b64, _ = synthesize_b64(req.text)
 
         return Response(content=base64.b64decode(b64), media_type="audio/wav")

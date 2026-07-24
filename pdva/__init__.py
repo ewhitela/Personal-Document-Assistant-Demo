@@ -1,5 +1,3 @@
-
-
 """Personal Document Voice Assistant (PDVA) starter package.
 
 You build these modules across Weeks 4 to 9:
@@ -10,6 +8,7 @@ You build these modules across Weeks 4 to 9:
     transcriber.Transcriber         Week 7   speech-to-text via faster-whisper
     tts.Speaker                     Week 8   text-to-speech via Piper
     vision.VisionModel              Week 9   visual input via ollama (optional)
+    assistant.Assistant             Week 10  orchestrator that runs one turn
 
 The signatures are fixed so the modules plug into each other and into the
 Week 10 service without changes. Fill in the bodies marked NotImplementedError.
@@ -21,11 +20,12 @@ from .rag import RAGPipeline
 from .transcriber import Transcriber
 from .tts import Speaker
 from .vision import VisionModel, VisionBackend, OllamaVisionBackend, RemoteVisionBackend
+from .assistant import Assistant
 
 __all__ = [
     "Passage", "RAGAnswer", "TranscriptSegment",
     "DocumentIndex", "LocalLLM", "RAGPipeline",
     "Transcriber", "Speaker",
     "VisionModel", "VisionBackend", "OllamaVisionBackend", "RemoteVisionBackend",
+    "Assistant",
 ]
-

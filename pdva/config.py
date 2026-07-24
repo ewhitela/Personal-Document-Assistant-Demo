@@ -25,7 +25,7 @@ CHUNK_OVERLAP = 50                     # words shared between neighbouring chunk
 # Week 5: which local model to call, where the ollama server is, how random.
 LLM_MODEL = "llama3.2:3b"              # must be pulled first: `ollama pull llama3.2:3b`
 LLM_HOST = "http://localhost:11434"
-LLM_TEMPERATURE = 0.2                  # low = more deterministic, good for grounded Q&A
+LLM_TEMPERATURE = 0.05                  # low = more deterministic, good for grounded Q&A
 
 # Week 6: how many passages to retrieve per question.
 RAG_TOP_K = 7

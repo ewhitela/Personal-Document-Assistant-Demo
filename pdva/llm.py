@@ -46,7 +46,7 @@ class LocalLLM:
         "owes what, which is greater, which came first), restate it in the "
         "same direction the passage states it. Reread the relationship before "
         "writing your answer to confirm you have not reversed it.\n\n"
-        "Answer directly and completely in 2-4 sentences, including key specifics "
+        "Answer directly and completely in 2-6 sentences, including key specifics "
         "from the context. If the context does not contain the answer, reply "
         "exactly: \"I don't know based on your documents.\" If the context only "
         "partially answers the question, give the partial answer plainly, then "
