@@ -9,7 +9,7 @@ integration step. Run this standalone to sanity-check the mic, wake
 word, and STT before that integration.
 
 Usage:
-    python voice_demo.py
+    python demo_voice.py
     Ctrl+C to quit.
 """
 from __future__ import annotations
@@ -120,7 +120,7 @@ def record_utterance(vad: webrtcvad.Vad, q: "queue.Queue[np.ndarray]", leftover:
 
 
 def main():
-    oww = WakeWordModel(wakeword_model_paths=[config.OPENWAKEWORD_MODEL])
+    oww = WakeWordModel(wakeword_models=[config.OPENWAKEWORD_MODEL])
     vad = webrtcvad.Vad(VAD_AGGRESSIVENESS)
     whisper = WhisperModel(
         config.WHISPER_MODEL,
