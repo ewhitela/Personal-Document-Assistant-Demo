@@ -34,7 +34,11 @@ jobs:
           run: uv python install 3.11
 
         - name: Install PortAudio (required by sounddevice)
-          run: sudo apt-get update && sudo apt-get install -y libportaudio2
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y libportaudio2
+            sudo ldconfig
+            ldconfig -p | grep -i portaudio || echo "WARNING: portaudio not found in ldconfig cache"
 
         - name: Install dependencies
           run: uv sync
