@@ -39,9 +39,6 @@ except ImportError:
 
 from . import config
 
-import sounddevice as sd
-import soundfile as sf
-
 logger = logging.getLogger(__name__)
 
 _SYN_CONFIG = (
