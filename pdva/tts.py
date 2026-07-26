@@ -151,6 +151,9 @@ class Speaker:
             the voice loop uses; synthesize is the testable core it builds on.
         """
 
+        import sounddevice as sd
+        import soundfile as sf
+
         if not self.is_ready():
             raise RuntimeError("Speaker voice is not loaded")
 
