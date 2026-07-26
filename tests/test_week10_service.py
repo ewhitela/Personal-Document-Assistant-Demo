@@ -11,7 +11,6 @@ import wave
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import pytest
 from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[0].parent))

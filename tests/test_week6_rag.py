@@ -15,8 +15,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pdva.types import Passage, RAGAnswer  # noqa: E402
-from pdva.rag import RAGPipeline           # noqa: E402
+from pdva.rag import RAGPipeline
+from pdva.types import Passage, RAGAnswer
 
 
 class FakeIndex:

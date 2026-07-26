@@ -38,8 +38,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel
 
 from pdva.assistant import Assistant
-from pdva.verifier import VerifiedRAGPipeline
-from pdva.verifier import verify
+from pdva.verifier import VerifiedRAGPipeline, verify
 
 logger = logging.getLogger("pdva.service")
 
@@ -59,7 +58,14 @@ class Components:
 
 def build_components() -> Components:
     """Load every model once. Import pdva lazily so this module stays cheap."""
-    from pdva import DocumentIndex, LocalLLM, RAGPipeline, Speaker, Transcriber, VisionModel
+    from pdva import (
+        DocumentIndex,
+        LocalLLM,
+        RAGPipeline,
+        Speaker,
+        Transcriber,
+        VisionModel,
+    )
 
     index = DocumentIndex()
     llm = LocalLLM()

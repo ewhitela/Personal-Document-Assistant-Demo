@@ -149,7 +149,7 @@ def main():
     whisper = load_whisper(args.model)
     wake = None if args.push_to_talk else load_wakeword(args.wakeword)
 
-    audio_q: "queue.Queue[np.ndarray]" = queue.Queue()
+    audio_q: queue.Queue[np.ndarray] = queue.Queue()
 
     def callback(indata, frames, time_info, status):
         if status:

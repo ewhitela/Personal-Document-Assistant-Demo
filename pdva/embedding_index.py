@@ -12,13 +12,16 @@ Run `python -m tests.test_week4_index` after implementing to check your work.
 """
 
 from __future__ import annotations
-from .types import Passage
-from . import config
-from pypdf import PdfReader
-from sentence_transformers import SentenceTransformer
-import chromadb
+
 import os
 import re
+
+import chromadb
+from pypdf import PdfReader
+from sentence_transformers import SentenceTransformer
+
+from . import config
+from .types import Passage
 
 URL_RE = re.compile(r"https?://\S+|\(\s*https?[^)]*\)?")
 FOOTNOTE_RE = re.compile(r"\[\d+\]")

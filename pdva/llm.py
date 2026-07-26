@@ -17,11 +17,11 @@ not running, so it is safe to run anytime).
 
 from __future__ import annotations
 
-from typing import Iterator
-
-from . import config
+from collections.abc import Iterator
 
 import ollama
+
+from . import config
 
 
 class LocalLLM:

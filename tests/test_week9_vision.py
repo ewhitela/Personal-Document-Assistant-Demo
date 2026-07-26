@@ -19,8 +19,11 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pdva.vision import (  # noqa: E402
-    build_image_message, encode_image_b64, VisionModel, VisionBackend,
+from pdva.vision import (
+    VisionBackend,
+    VisionModel,
+    build_image_message,
+    encode_image_b64,
 )
 
 

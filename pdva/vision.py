@@ -30,10 +30,10 @@ from __future__ import annotations
 import base64
 from abc import ABC, abstractmethod
 
-from . import config
-
 import ollama
 import requests
+
+from . import config
 
 
 # ---------------------------------------------------------------------------
@@ -214,7 +214,7 @@ class VisionModel:
 
     @classmethod
     def local(cls, model: str = config.VISION_MODEL_LOCAL,
-              host: str = config.LLM_HOST) -> "VisionModel":
+              host: str = config.LLM_HOST) -> VisionModel:
         """A VisionModel backed by a local ollama vision model."""
         
         return cls(OllamaVisionBackend(model=model, host=host))
@@ -222,7 +222,7 @@ class VisionModel:
     @classmethod
     def remote(cls, endpoint: str = config.VISION_REMOTE_URL,
                model: str = config.VISION_MODEL_REMOTE,
-               api_key: str | None = None) -> "VisionModel":
+               api_key: str | None = None) -> VisionModel:
         """A VisionModel backed by a remote HTTP vision server."""
 
         return cls(RemoteVisionBackend(endpoint=endpoint, model=model, api_key=api_key))

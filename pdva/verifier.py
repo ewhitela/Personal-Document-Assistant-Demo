@@ -32,8 +32,8 @@ v2: adds two checks the first version missed.
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Iterable
 
 ABSTAIN = "I don't know based on your documents."
 

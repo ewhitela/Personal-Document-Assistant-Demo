@@ -13,7 +13,7 @@ grading in evaluate_qa. Run it against your real, built assistant:
 from __future__ import annotations
 
 import time
-from typing import Callable
+from collections.abc import Callable
 
 
 def measure_latency(label: str, fn: Callable, *args, **kwargs):
@@ -90,16 +90,16 @@ GOLD: list[tuple] = [
      "Pittsburgh - Wikipedia.pdf", "ohio river"),
     ("What was Pittsburgh's historical industry, and how has that changed?",
      "Pittsburgh - Wikipedia.pdf", "steel"),
-    ("What's Pittsburgh's population according to the most recent census "
-     "mentioned in the article?",
+    (("What's Pittsburgh's population according to the most recent census "
+      "mentioned in the article?"),
      "Pittsburgh - Wikipedia.pdf", "302,971"),
-    ("What's the elevation of Flagstaff, and why does that matter for the "
-     "city's climate?",
+    (("What's the elevation of Flagstaff, and why does that matter for the "
+      "city's climate?"),
      "Flagstaff, Arizona - Wikipedia.pdf", "7,000"),
     ("Has Flagstaff ever hosted a Winter Olympics?",
      "Flagstaff, Arizona - Wikipedia.pdf", "1960"),
-    ("How many boilers did Itsukushima have, and what was her average "
-     "maximum speed?",
+    (("How many boilers did Itsukushima have, and what was her average "
+      "maximum speed?"),
      "Japanese cruiser Itsukushima - Wikipedia.pdf", "16.78"),
     ("Did Itsukushima survive World War II?",
      "Japanese cruiser Itsukushima - Wikipedia.pdf", REFUSAL_PHRASE),
@@ -163,8 +163,14 @@ def evaluate_qa(assistant) -> dict:
 if __name__ == "__main__":
     # Wire your real assistant here, then uncomment.
     #
-    from pdva import (DocumentIndex, LocalLLM, RAGPipeline, Transcriber,
-                       Speaker, Assistant)
+    from pdva import (
+        Assistant,
+        DocumentIndex,
+        LocalLLM,
+        RAGPipeline,
+        Speaker,
+        Transcriber,
+    )
     index = DocumentIndex()  # loads existing PERSIST_DIR / COLLECTION_NAME
     bot = Assistant(Transcriber(), RAGPipeline(index=index, llm=LocalLLM()), Speaker())
     time_text_turn(bot, "What rivers meet in Pittsburgh, and what do they form?")

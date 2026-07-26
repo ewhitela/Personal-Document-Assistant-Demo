@@ -13,19 +13,27 @@ You build these modules across Weeks 4 to 9:
 The signatures are fixed so the modules plug into each other and into the
 Week 10 service without changes. Fill in the bodies marked NotImplementedError.
 """
-from .types import Passage, RAGAnswer, TranscriptSegment
+from .assistant import Assistant
 from .embedding_index import DocumentIndex
 from .llm import LocalLLM
 from .rag import RAGPipeline
 from .transcriber import Transcriber
 from .tts import Speaker
-from .vision import VisionModel, VisionBackend, OllamaVisionBackend, RemoteVisionBackend
-from .assistant import Assistant
+from .types import Passage, RAGAnswer, TranscriptSegment
+from .vision import OllamaVisionBackend, RemoteVisionBackend, VisionBackend, VisionModel
 
 __all__ = [
-    "Passage", "RAGAnswer", "TranscriptSegment",
-    "DocumentIndex", "LocalLLM", "RAGPipeline",
-    "Transcriber", "Speaker",
-    "VisionModel", "VisionBackend", "OllamaVisionBackend", "RemoteVisionBackend",
     "Assistant",
+    "DocumentIndex",
+    "LocalLLM",
+    "OllamaVisionBackend",
+    "Passage",
+    "RAGAnswer",
+    "RAGPipeline",
+    "RemoteVisionBackend",
+    "Speaker",
+    "Transcriber",
+    "TranscriptSegment",
+    "VisionBackend",
+    "VisionModel",
 ]

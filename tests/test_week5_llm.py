@@ -14,7 +14,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pdva.llm import LocalLLM  # noqa: E402
+from pdva.llm import LocalLLM
 
 
 def test_connectivity_and_nonempty():

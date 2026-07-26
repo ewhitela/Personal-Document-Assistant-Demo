@@ -14,15 +14,14 @@ Usage:
 """
 from __future__ import annotations
 
-import collections
 import queue
 import sys
 
 import numpy as np
 import sounddevice as sd
 import webrtcvad
-from openwakeword.model import Model as WakeWordModel
 from faster_whisper import WhisperModel
+from openwakeword.model import Model as WakeWordModel
 
 from pdva import config
 
@@ -66,7 +65,7 @@ def audio_stream():
     return stream, q
 
 
-def read_frame(q: "queue.Queue[np.ndarray]", n_samples: int, leftover: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def read_frame(q: queue.Queue[np.ndarray], n_samples: int, leftover: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Pulls exactly n_samples int16 samples, buffering across queue reads.
 
     Returns (frame, new_leftover).
@@ -79,7 +78,7 @@ def read_frame(q: "queue.Queue[np.ndarray]", n_samples: int, leftover: np.ndarra
     return frame, rest
 
 
-def wait_for_wake_word(oww: WakeWordModel, q: "queue.Queue[np.ndarray]") -> np.ndarray:
+def wait_for_wake_word(oww: WakeWordModel, q: queue.Queue[np.ndarray]) -> np.ndarray:
     """Blocks until the wake word fires. Returns leftover samples not yet consumed."""
     leftover = np.zeros(0, dtype=np.int16)
     print("Listening for wake word...")
@@ -95,7 +94,7 @@ def wait_for_wake_word(oww: WakeWordModel, q: "queue.Queue[np.ndarray]") -> np.n
             return leftover
 
 
-def record_utterance(vad: webrtcvad.Vad, q: "queue.Queue[np.ndarray]", leftover: np.ndarray) -> np.ndarray:
+def record_utterance(vad: webrtcvad.Vad, q: queue.Queue[np.ndarray], leftover: np.ndarray) -> np.ndarray:
     """Records until webrtcvad sees sustained silence, or a max duration is hit.
 
     Returns the recorded audio as float32 in [-1, 1], ready for faster-whisper.

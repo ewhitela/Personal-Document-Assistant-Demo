@@ -14,7 +14,7 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pdva.tts import split_sentences, Speaker  # noqa: E402
+from pdva.tts import Speaker, split_sentences
 
 
 def test_split_sentences():

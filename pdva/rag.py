@@ -12,12 +12,12 @@ logic directly.
 """
 from __future__ import annotations
 
-from typing import Iterator
+from collections.abc import Iterator
 
-from .types import Passage, RAGAnswer
+from . import config
 from .embedding_index import DocumentIndex
 from .llm import LocalLLM
-from . import config
+from .types import Passage, RAGAnswer
 
 
 class RAGPipeline:

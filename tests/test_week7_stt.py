@@ -14,7 +14,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pdva.transcriber import join_segments, Transcriber  # noqa: E402
+from pdva.transcriber import Transcriber, join_segments
 
 
 class _Seg:

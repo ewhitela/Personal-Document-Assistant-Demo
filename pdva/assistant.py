@@ -19,8 +19,6 @@ it runs offline with no models.
 """
 from __future__ import annotations
 
-from typing import Optional
-
 from .types import RAGAnswer
 
 
@@ -56,7 +54,7 @@ class Assistant:
         """Answer a typed question. Behavior: return self.rag.answer(question)."""
         return self.rag.answer(question)
     
-    def answer_spoken(self, audio_path: str, out_wav: Optional[str] = None):
+    def answer_spoken(self, audio_path: str, out_wav: str | None = None):
         """Answer a spoken question, end to end.
 
         Behavior:
@@ -81,7 +79,7 @@ class Assistant:
  
         return question, result, out_wav
 
-    def speak(self, text: str, out_wav: Optional[str] = None):
+    def speak(self, text: str, out_wav: str | None = None):
         """Speak arbitrary text. synthesize to out_wav if given, else say it."""
 
         if out_wav is not None:

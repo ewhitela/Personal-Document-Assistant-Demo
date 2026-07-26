@@ -19,15 +19,13 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-import time
-
 try:
     from faster_whisper import WhisperModel
 except ImportError:
     WhisperModel = None
 
-from .types import TranscriptSegment
 from . import config
+from .types import TranscriptSegment
 
 logger = logging.getLogger(__name__)
 

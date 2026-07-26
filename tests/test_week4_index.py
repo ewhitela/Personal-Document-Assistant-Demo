@@ -9,14 +9,14 @@ PASS. This test indexes a few tiny text files, so the first run downloads the
 embedding model (a one-time, ~80 MB download).
 """
 import os
-import sys
 import shutil
+import sys
 import tempfile
 
 # Make `import pdva` work no matter which directory you run this from.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pdva.embedding_index import DocumentIndex  # noqa: E402
+from pdva.embedding_index import DocumentIndex
 
 DOCS = {
     "passwords.txt": "To reset your password, open Settings, choose Security, then Reset password.",

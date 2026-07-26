@@ -26,11 +26,11 @@ skips cleanly if Piper or the voice file is missing.
 from __future__ import annotations
 
 import logging
+import os
 import re
 import tempfile
-import os
-import wave
 import time
+import wave
 
 try:
     from piper import PiperVoice, SynthesisConfig
@@ -38,8 +38,8 @@ except ImportError:
     PiperVoice = None
     SynthesisConfig = None
 
-import soundfile as sf
 import sounddevice as sd
+import soundfile as sf
 
 from . import config
 
