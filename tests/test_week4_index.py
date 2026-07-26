@@ -28,7 +28,7 @@ DOCS = {
 
 def _write_docs(folder):
     paths = []
-    
+
     for name, text in DOCS.items():
         p = os.path.join(folder, name)
         with open(p, "w", encoding="utf-8") as f:
