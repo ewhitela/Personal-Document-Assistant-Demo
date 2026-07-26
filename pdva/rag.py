@@ -10,6 +10,7 @@ Run `python -m tests.test_week6_rag` after implementing. That test uses small
 fake Index and LLM stubs, so it runs without ollama and checks your pipeline
 logic directly.
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -39,13 +40,14 @@ class RAGPipeline:
         "writing your answer to confirm you have not reversed it.\n\n"
         "Answer directly and completely in 2-6 sentences, including key specifics "
         "from the context. If the context does not contain the answer, reply "
-        "exactly: \"I don't know based on your documents.\" If the context only "
+        'exactly: "I don\'t know based on your documents." If the context only '
         "partially answers the question, give the partial answer plainly, then "
         "briefly state which part of the question the context does not address."
     )
 
-    def __init__(self, index: DocumentIndex, llm: LocalLLM,
-                 k: int = config.RAG_TOP_K) -> None:
+    def __init__(
+        self, index: DocumentIndex, llm: LocalLLM, k: int = config.RAG_TOP_K
+    ) -> None:
         """Wire a retriever and a generator together.
 
         Args:
@@ -98,8 +100,8 @@ class RAGPipeline:
         """
 
         passages = self.index.search(question, self.k)
-        prompt   = self.build_prompt(question, passages)
-        text     = self.llm.generate(prompt, system=self.SYSTEM_PROMPT)
+        prompt = self.build_prompt(question, passages)
+        text = self.llm.generate(prompt, system=self.SYSTEM_PROMPT)
         return RAGAnswer(answer=text, sources=passages, prompt=prompt)
 
     def stream_answer(self, question: str) -> Iterator[str]:
@@ -110,5 +112,5 @@ class RAGPipeline:
 
         passages = self.index.search(question, self.k)
         prompt = self.build_prompt(question, passages)
-        
+
         yield from self.llm.stream(prompt, system=self.SYSTEM_PROMPT)

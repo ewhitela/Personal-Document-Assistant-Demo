@@ -2,6 +2,7 @@
 
 Run: python -m pytest tests/test_week10_service.py -q
 """
+
 from __future__ import annotations
 
 import base64
@@ -78,10 +79,14 @@ class FakeSpeaker:
 
 def client(tmp_path, monkeypatch):
     from service import app as app_module
+
     monkeypatch.setattr(app_module, "DOCS_DIR", tmp_path)
     comp = app_module.Components(
-        index=FakeIndex(), llm=FakeLLM(), pipeline=FakePipeline(),
-        transcriber=FakeTranscriber(), speaker=FakeSpeaker(),
+        index=FakeIndex(),
+        llm=FakeLLM(),
+        pipeline=FakePipeline(),
+        transcriber=FakeTranscriber(),
+        speaker=FakeSpeaker(),
     )
     application = app_module.create_app(components=comp)
     with TestClient(application) as c:
@@ -91,13 +96,19 @@ def client(tmp_path, monkeypatch):
 
 def test_health(client):
     h = client.get("/health").json()
-    assert h == {"llm_ready": True, "stt_ready": True,
-                 "tts_ready": True, "indexed_chunks": 0}
+    assert h == {
+        "llm_ready": True,
+        "stt_ready": True,
+        "tts_ready": True,
+        "indexed_chunks": 0,
+    }
 
 
 def test_upload_list_delete_roundtrip(client):
-    files = [("files", ("a.txt", b"hello world", "text/plain")),
-             ("files", ("b.md", b"# hi", "text/markdown"))]
+    files = [
+        ("files", ("a.txt", b"hello world", "text/plain")),
+        ("files", ("b.md", b"# hi", "text/markdown")),
+    ]
     r = client.post("/documents", files=files)
     assert r.status_code == 200
     assert r.json()["chunks_added"] == 4
@@ -107,15 +118,16 @@ def test_upload_list_delete_roundtrip(client):
 
     r = client.delete("/documents/a.txt")
     assert r.status_code == 200
-    assert client.comp.index.reset_calls == 1          # reset + re-add pattern
+    assert client.comp.index.reset_calls == 1  # reset + re-add pattern
     assert client.get("/documents").json()["documents"] == ["b.md"]
 
     assert client.delete("/documents/missing.txt").status_code == 404
 
 
 def test_upload_rejects_unsupported_type(client):
-    r = client.post("/documents",
-                    files=[("files", ("x.exe", b"nope", "application/x-msdownload"))])
+    r = client.post(
+        "/documents", files=[("files", ("x.exe", b"nope", "application/x-msdownload"))]
+    )
     assert r.status_code == 400
 
 
@@ -140,16 +152,26 @@ def test_ask_with_speech(client):
 def test_voice_ask(client):
     buf = io.BytesIO()
     with wave.open(buf, "wb") as w:
-        w.setnchannels(1); w.setsampwidth(2); w.setframerate(16000)
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(16000)
         w.writeframes(b"\x00\x00" * 1600)
-    r = client.post("/voice/ask", params={"speak": "true"},
-                    files={"audio": ("q.wav", buf.getvalue(), "audio/wav")})
+    r = client.post(
+        "/voice/ask",
+        params={"speak": "true"},
+        files={"audio": ("q.wav", buf.getvalue(), "audio/wav")},
+    )
     assert r.status_code == 200
     body = r.json()
     assert body["transcript"] == "what is chromadb"
     assert body["answer"]
-    assert set(body["timings"]) == {"stt_s", "retrieve_s", "generate_s",
-                                    "tts_s", "total_s"}
+    assert set(body["timings"]) == {
+        "stt_s",
+        "retrieve_s",
+        "generate_s",
+        "tts_s",
+        "total_s",
+    }
 
 
 def test_voice_ask_503_without_transcriber(client):

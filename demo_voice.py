@@ -12,6 +12,7 @@ Usage:
     python demo_voice.py
     Ctrl+C to quit.
 """
+
 from __future__ import annotations
 
 import queue
@@ -37,8 +38,8 @@ VAD_FRAME_SAMPLES = SAMPLE_RATE * VAD_FRAME_MS // 1000
 
 WAKE_THRESHOLD = 0.5
 # How much trailing silence (in VAD frames) ends an utterance.
-SILENCE_FRAMES_TO_STOP = int(0.8 * 1000 / VAD_FRAME_MS)   # ~0.8s of silence
-MAX_UTTERANCE_FRAMES = int(15 * 1000 / VAD_FRAME_MS)      # 15s hard cap
+SILENCE_FRAMES_TO_STOP = int(0.8 * 1000 / VAD_FRAME_MS)  # ~0.8s of silence
+MAX_UTTERANCE_FRAMES = int(15 * 1000 / VAD_FRAME_MS)  # 15s hard cap
 VAD_AGGRESSIVENESS = 2
 
 
@@ -65,7 +66,9 @@ def audio_stream():
     return stream, q
 
 
-def read_frame(q: queue.Queue[np.ndarray], n_samples: int, leftover: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def read_frame(
+    q: queue.Queue[np.ndarray], n_samples: int, leftover: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     """Pulls exactly n_samples int16 samples, buffering across queue reads.
 
     Returns (frame, new_leftover).
@@ -94,7 +97,9 @@ def wait_for_wake_word(oww: WakeWordModel, q: queue.Queue[np.ndarray]) -> np.nda
             return leftover
 
 
-def record_utterance(vad: webrtcvad.Vad, q: queue.Queue[np.ndarray], leftover: np.ndarray) -> np.ndarray:
+def record_utterance(
+    vad: webrtcvad.Vad, q: queue.Queue[np.ndarray], leftover: np.ndarray
+) -> np.ndarray:
     """Records until webrtcvad sees sustained silence, or a max duration is hit.
 
     Returns the recorded audio as float32 in [-1, 1], ready for faster-whisper.
@@ -134,7 +139,9 @@ def main():
                 leftover = wait_for_wake_word(oww, q)
                 audio = record_utterance(vad, q, leftover)
                 segments, _info = whisper.transcribe(audio, language="en")
-                text = " ".join(seg.text.strip() for seg in segments)  # consume generator fully before timing/using it
+                text = " ".join(
+                    seg.text.strip() for seg in segments
+                )  # consume generator fully before timing/using it
                 if text:
                     print(f"You said: {text}")
                 else:

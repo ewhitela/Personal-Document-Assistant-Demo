@@ -1,10 +1,9 @@
-
-
 """Shared data types used across Weeks 4-6.
 
 These small dataclasses are the contract between modules. The DocumentIndex
 returns Passage objects; the RAGPipeline returns a RAGAnswer. Keep them stable.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -21,6 +20,7 @@ class Passage:
         chunk_id: the deterministic id of this chunk in the index.
         metadata: any extra fields stored alongside the chunk.
     """
+
     text: str
     source: str
     score: float
@@ -37,6 +37,7 @@ class RAGAnswer:
         sources: the passages the answer was grounded in (for citation/UI).
         prompt:  the final prompt sent to the LLM (kept for debugging).
     """
+
     answer: str
     sources: list[Passage]
     prompt: str = ""
@@ -51,7 +52,7 @@ class TranscriptSegment:
         end:   end time in seconds.
         text:  the words spoken in this span.
     """
+
     start: float
     end: float
     text: str
-

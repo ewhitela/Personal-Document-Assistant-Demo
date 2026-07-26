@@ -1,5 +1,3 @@
-
-
 """Sanity tests for the Week 9 vision module (optional).
 
     python tests/test_week9_vision.py
@@ -12,6 +10,7 @@ for the routing check, since the VisionModel facade is provided):
 The live check needs a real backend (ollama vision model, or your remote server)
 and a sample image at tests/data/sample.png; it SKIPs otherwise.
 """
+
 import base64
 import os
 import sys
@@ -30,8 +29,12 @@ from pdva.vision import (
 def test_build_image_message():
     msg = build_image_message("/tmp/pic.png", "What is in this image?")
     assert msg.get("role") == "user", "role should be 'user'"
-    assert msg.get("content") == "What is in this image?", "content should be the question"
-    assert msg.get("images") == ["/tmp/pic.png"], "images should be a list holding the path"
+    assert msg.get("content") == "What is in this image?", (
+        "content should be the question"
+    )
+    assert msg.get("images") == ["/tmp/pic.png"], (
+        "images should be a list holding the path"
+    )
 
 
 def test_encode_image_b64():
@@ -42,13 +45,17 @@ def test_encode_image_b64():
         f.write(raw)
     out = encode_image_b64(path)
     assert isinstance(out, str), "should return a str"
-    assert base64.b64decode(out) == raw, "decoding the result should recover the original bytes"
+    assert base64.b64decode(out) == raw, (
+        "decoding the result should recover the original bytes"
+    )
 
 
 class _FakeBackend(VisionBackend):
     """A backend that needs no model, to test that the facade delegates to it."""
+
     def is_ready(self):
         return True
+
     def ask(self, image_path, question):
         return f"seen:{os.path.basename(image_path)}|q:{question}"
 
@@ -59,7 +66,9 @@ def test_backend_routing():
     out = vm.ask("/tmp/cat.png", "what animal?")
     assert out == "seen:cat.png|q:what animal?", "facade.ask should call backend.ask"
     desc = vm.describe("/tmp/cat.png")
-    assert desc.startswith("seen:cat.png|q:"), "describe should route through ask with a fixed prompt"
+    assert desc.startswith("seen:cat.png|q:"), (
+        "describe should route through ask with a fixed prompt"
+    )
 
 
 def test_live_ask():
@@ -84,13 +93,17 @@ def _run():
         if name.startswith("test_") and callable(fn):
             try:
                 r = fn()
-                status = r.upper() if isinstance(r, str) and r in ("skip", "warn") else "PASS"
+                status = (
+                    r.upper()
+                    if isinstance(r, str) and r in ("skip", "warn")
+                    else "PASS"
+                )
                 results.append((status, name, ""))
             except NotImplementedError:
                 results.append(("TODO", name, "not implemented yet"))
             except AssertionError as e:
                 results.append(("FAIL", name, str(e)))
-            except Exception as e:  # noqa: BLE001
+            except Exception as e:
                 results.append(("ERROR", name, repr(e)))
     w = max(len(n) for _, n, _ in results)
     hard = 0
@@ -98,9 +111,14 @@ def _run():
         print(f"{s:5s} {n:<{w}}  {msg}")
         if s in ("FAIL", "ERROR"):
             hard += 1
-    print("\n" + ", ".join(f"{s}={sum(1 for x, _, _ in results if x == s)}"
-                           for s in ["PASS", "SKIP", "WARN", "TODO", "FAIL", "ERROR"]
-                           if any(x == s for x, _, _ in results)))
+    print(
+        "\n"
+        + ", ".join(
+            f"{s}={sum(1 for x, _, _ in results if x == s)}"
+            for s in ["PASS", "SKIP", "WARN", "TODO", "FAIL", "ERROR"]
+            if any(x == s for x, _, _ in results)
+        )
+    )
     raise SystemExit(1 if hard else 0)
 
 

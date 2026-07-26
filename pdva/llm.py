@@ -48,27 +48,28 @@ class LocalLLM:
         "writing your answer to confirm you have not reversed it.\n\n"
         "Answer directly and completely in 2-6 sentences, including key specifics "
         "from the context. If the context does not contain the answer, reply "
-        "exactly: \"I don't know based on your documents.\" If the context only "
+        'exactly: "I don\'t know based on your documents." If the context only '
         "partially answers the question, give the partial answer plainly, then "
         "briefly state which part of the question the context does not address."
     )
 
-    def __init__(self,
-                 model: str = config.LLM_MODEL,
-                 host: str = config.LLM_HOST,
-                 temperature: float = config.LLM_TEMPERATURE) -> None:
+    def __init__(
+        self,
+        model: str = config.LLM_MODEL,
+        host: str = config.LLM_HOST,
+        temperature: float = config.LLM_TEMPERATURE,
+    ) -> None:
         """Store config and create the ollama client. Do NOT block or download here.
 
         Hint: `self.client = ollama.Client(host=host)` and keep model/temperature
         on self for later calls.
         """
-        
+
         self.client = ollama.Client(host=host)
 
         self.model = model
         self.temperature = temperature
         self.host = host
-
 
     def is_ready(self) -> bool:
         """Return True only if the server is reachable AND `self.model` is pulled.
@@ -81,7 +82,7 @@ class LocalLLM:
         """
 
         try:
-            response = self.client.list() # fetch local models
+            response = self.client.list()  # fetch local models
             models = [m.model for m in response.models]
             return self.model in models
         except Exception:
@@ -101,8 +102,10 @@ class LocalLLM:
         and reuse self.chat, or call client.chat and read
         response["message"]["content"].
         """
-        messages = [{'role': 'system', 'content': system or self.DEFAULT_SYSTEM},
-                    {'role': 'user', 'content': prompt}]
+        messages = [
+            {"role": "system", "content": system or self.DEFAULT_SYSTEM},
+            {"role": "user", "content": prompt},
+        ]
 
         return self.chat(messages)
 
@@ -124,7 +127,7 @@ class LocalLLM:
         )
 
         return response.message.content
-    
+
     def stream(self, prompt: str, system: str | None = None) -> Iterator[str]:
         """Yield the answer in chunks as it is generated.
 
@@ -134,12 +137,15 @@ class LocalLLM:
             yield each chunk's text.
         """
 
-        messages = [{'role': 'system', 'content': system or self.DEFAULT_SYSTEM}, {'role': 'user', 'content': prompt}]
-        
+        messages = [
+            {"role": "system", "content": system or self.DEFAULT_SYSTEM},
+            {"role": "user", "content": prompt},
+        ]
+
         for chunk in self.client.chat(
             model=self.model,
             messages=messages,
             options={"temperature": self.temperature, "num_predict": 220},
-            stream=True
+            stream=True,
         ):
             yield chunk.message.content

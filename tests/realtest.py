@@ -49,8 +49,12 @@ class DemoApp:
         frame = tk.Frame(self.root, bd=1, relief=tk.SUNKEN)
         frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
 
-        tk.Label(frame, text="Documents", font=("Segoe UI", 11, "bold")).pack(pady=(5, 0))
-        self.add_files_button = tk.Button(frame, text="Add Files", command=self.on_add_files)
+        tk.Label(frame, text="Documents", font=("Segoe UI", 11, "bold")).pack(
+            pady=(5, 0)
+        )
+        self.add_files_button = tk.Button(
+            frame, text="Add Files", command=self.on_add_files
+        )
         self.add_files_button.pack(pady=5, fill=tk.X, padx=5)
 
         # scrollable list of files
@@ -58,7 +62,9 @@ class DemoApp:
         list_container.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         canvas = tk.Canvas(list_container, highlightthickness=0)
-        scrollbar = tk.Scrollbar(list_container, orient="vertical", command=canvas.yview)
+        scrollbar = tk.Scrollbar(
+            list_container, orient="vertical", command=canvas.yview
+        )
         self.file_list_frame = tk.Frame(canvas)
 
         self.file_list_frame.bind(
@@ -77,7 +83,9 @@ class DemoApp:
         frame = tk.Frame(self.root)
         frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
 
-        tk.Label(frame, text="Ask a question", font=("Segoe UI", 11, "bold")).pack(pady=(5, 0))
+        tk.Label(frame, text="Ask a question", font=("Segoe UI", 11, "bold")).pack(
+            pady=(5, 0)
+        )
 
         self.prompt_text = tk.Text(frame, height=8, wrap=tk.WORD)
         self.prompt_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -94,7 +102,9 @@ class DemoApp:
         frame.grid(row=0, column=2, sticky="nsew", padx=5, pady=5)
 
         tk.Label(frame, text="Answer", font=("Segoe UI", 11, "bold")).pack(pady=(5, 0))
-        self.output_box = scrolledtext.ScrolledText(frame, wrap=tk.WORD, state="disabled")
+        self.output_box = scrolledtext.ScrolledText(
+            frame, wrap=tk.WORD, state="disabled"
+        )
         self.output_box.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
     # file panel
@@ -144,7 +154,10 @@ class DemoApp:
         label.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
         remove_btn = tk.Button(
-            row, text="x", fg="red", width=2,
+            row,
+            text="x",
+            fg="red",
+            width=2,
             command=lambda: self.on_remove_file(path, row),
         )
         remove_btn.pack(side=tk.RIGHT)
@@ -178,7 +191,9 @@ class DemoApp:
         self.send_button.config(state="normal")
 
     def _on_rebuild_error(self, error):
-        self.status_label.config(text=f"{len(self.files)} documents indexed (rebuild failed)")
+        self.status_label.config(
+            text=f"{len(self.files)} documents indexed (rebuild failed)"
+        )
         self.add_files_button.config(state="normal")
         self.send_button.config(state="normal")
         messagebox.showerror("Rebuild failed", str(error))
@@ -190,7 +205,9 @@ class DemoApp:
         if not prompt:
             return
         if not self.files:
-            messagebox.showinfo("No documents", "Add at least one document before asking a question.")
+            messagebox.showinfo(
+                "No documents", "Add at least one document before asking a question."
+            )
             return
 
         self.send_button.config(state="disabled")

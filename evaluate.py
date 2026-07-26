@@ -10,6 +10,7 @@ grading in evaluate_qa. Run it against your real, built assistant:
 
     python eval/evaluate.py
 """
+
 from __future__ import annotations
 
 import time
@@ -21,7 +22,7 @@ def measure_latency(label: str, fn: Callable, *args, **kwargs):
     start = time.perf_counter()
     result = fn(*args, **kwargs)
     elapsed = time.perf_counter() - start
-    print(f"{label:<14} {elapsed*1000:8.1f} ms")
+    print(f"{label:<14} {elapsed * 1000:8.1f} ms")
     return result, elapsed
 
 
@@ -29,7 +30,7 @@ def time_text_turn(assistant, question: str):
     """Time one typed turn end to end. Provided as an example of measure_latency."""
     print(f"\nQuestion: {question!r}")
     result, total = measure_latency("answer_text", assistant.answer_text, question)
-    print(f"{'total':<14} {total*1000:8.1f} ms")
+    print(f"{'total':<14} {total * 1000:8.1f} ms")
     return result
 
 
@@ -53,8 +54,8 @@ def time_text_turn_by_stage(assistant, question: str, speak: bool = False):
 
     retrieve_s = t1 - t0
     generate_s = t2 - t1
-    print(f"{'retrieve':<14} {retrieve_s*1000:8.1f} ms")
-    print(f"{'generate':<14} {generate_s*1000:8.1f} ms")
+    print(f"{'retrieve':<14} {retrieve_s * 1000:8.1f} ms")
+    print(f"{'generate':<14} {generate_s * 1000:8.1f} ms")
 
     tts_s = None
     if speak:
@@ -64,14 +65,22 @@ def time_text_turn_by_stage(assistant, question: str, speak: bool = False):
             t3 = time.perf_counter()
             assistant.speaker.synthesize(text, "/tmp/_eval_tts.wav")
             tts_s = time.perf_counter() - t3
-            print(f"{'synthesize':<14} {tts_s*1000:8.1f} ms")
+            print(f"{'synthesize':<14} {tts_s * 1000:8.1f} ms")
 
     total_s = retrieve_s + generate_s + (tts_s or 0.0)
-    print(f"{'total':<14} {total_s*1000:8.1f} ms"
-          f"{'  *** OVER 3s BUDGET ***' if total_s > 3.0 else ''}")
+    print(
+        f"{'total':<14} {total_s * 1000:8.1f} ms"
+        f"{'  *** OVER 3s BUDGET ***' if total_s > 3.0 else ''}"
+    )
 
-    return {"answer": text, "sources": passages, "retrieve_s": retrieve_s,
-            "generate_s": generate_s, "tts_s": tts_s, "total_s": total_s}
+    return {
+        "answer": text,
+        "sources": passages,
+        "retrieve_s": retrieve_s,
+        "generate_s": generate_s,
+        "tts_s": tts_s,
+        "total_s": total_s,
+    }
 
 
 # --- You fill these in for the quality evaluation -------------------------------
@@ -86,29 +95,61 @@ def time_text_turn_by_stage(assistant, question: str, speak: bool = False):
 REFUSAL_PHRASE = "i don't know based on your documents"
 
 GOLD: list[tuple] = [
-    ("What rivers meet in Pittsburgh, and what do they form?",
-     "Pittsburgh - Wikipedia.pdf", "ohio river"),
-    ("What was Pittsburgh's historical industry, and how has that changed?",
-     "Pittsburgh - Wikipedia.pdf", "steel"),
-    (("What's Pittsburgh's population according to the most recent census "
-      "mentioned in the article?"),
-     "Pittsburgh - Wikipedia.pdf", "302,971"),
-    (("What's the elevation of Flagstaff, and why does that matter for the "
-      "city's climate?"),
-     "Flagstaff, Arizona - Wikipedia.pdf", "7,000"),
-    ("Has Flagstaff ever hosted a Winter Olympics?",
-     "Flagstaff, Arizona - Wikipedia.pdf", "1960"),
-    (("How many boilers did Itsukushima have, and what was her average "
-      "maximum speed?"),
-     "Japanese cruiser Itsukushima - Wikipedia.pdf", "16.78"),
-    ("Did Itsukushima survive World War II?",
-     "Japanese cruiser Itsukushima - Wikipedia.pdf", REFUSAL_PHRASE),
-    ("What's the maximum recorded length of the black-faced blenny?",
-     "Black-faced blenny - Wikipedia.pdf", "8 cent"),
-    ("Is the black-faced blenny venomous?",
-     "Black-faced blenny - Wikipedia.pdf", REFUSAL_PHRASE),
-    ("What is the capital of Andhra Pradesh?",
-     None, REFUSAL_PHRASE),
+    (
+        "What rivers meet in Pittsburgh, and what do they form?",
+        "Pittsburgh - Wikipedia.pdf",
+        "ohio river",
+    ),
+    (
+        "What was Pittsburgh's historical industry, and how has that changed?",
+        "Pittsburgh - Wikipedia.pdf",
+        "steel",
+    ),
+    (
+        (
+            "What's Pittsburgh's population according to the most recent census "
+            "mentioned in the article?"
+        ),
+        "Pittsburgh - Wikipedia.pdf",
+        "302,971",
+    ),
+    (
+        (
+            "What's the elevation of Flagstaff, and why does that matter for the "
+            "city's climate?"
+        ),
+        "Flagstaff, Arizona - Wikipedia.pdf",
+        "7,000",
+    ),
+    (
+        "Has Flagstaff ever hosted a Winter Olympics?",
+        "Flagstaff, Arizona - Wikipedia.pdf",
+        "1960",
+    ),
+    (
+        (
+            "How many boilers did Itsukushima have, and what was her average "
+            "maximum speed?"
+        ),
+        "Japanese cruiser Itsukushima - Wikipedia.pdf",
+        "16.78",
+    ),
+    (
+        "Did Itsukushima survive World War II?",
+        "Japanese cruiser Itsukushima - Wikipedia.pdf",
+        REFUSAL_PHRASE,
+    ),
+    (
+        "What's the maximum recorded length of the black-faced blenny?",
+        "Black-faced blenny - Wikipedia.pdf",
+        "8 cent",
+    ),
+    (
+        "Is the black-faced blenny venomous?",
+        "Black-faced blenny - Wikipedia.pdf",
+        REFUSAL_PHRASE,
+    ),
+    ("What is the capital of Andhra Pradesh?", None, REFUSAL_PHRASE),
 ]
 
 
@@ -152,8 +193,10 @@ def evaluate_qa(assistant) -> dict:
     print(f"\n{'question':<70} {'retrieval':<10} {'answer'}")
     for question, retrieval_hit, hit_ok in rows:
         q_display = (question[:67] + "...") if len(question) > 70 else question
-        print(f"{q_display:<70} {'OK' if retrieval_hit else 'MISS':<10} "
-              f"{'OK' if hit_ok else 'MISS'}")
+        print(
+            f"{q_display:<70} {'OK' if retrieval_hit else 'MISS':<10} "
+            f"{'OK' if hit_ok else 'MISS'}"
+        )
 
     summary = {"n": n, "retrieval_hits": retrieval_hits, "answer_ok": answer_ok}
     print(f"\nRetrieval: {retrieval_hits}/{n}   Answer quality: {answer_ok}/{n}")
@@ -171,8 +214,11 @@ if __name__ == "__main__":
         Speaker,
         Transcriber,
     )
+
     index = DocumentIndex()  # loads existing PERSIST_DIR / COLLECTION_NAME
     bot = Assistant(Transcriber(), RAGPipeline(index=index, llm=LocalLLM()), Speaker())
     time_text_turn(bot, "What rivers meet in Pittsburgh, and what do they form?")
-    time_text_turn_by_stage(bot, "What rivers meet in Pittsburgh, and what do they form?")
+    time_text_turn_by_stage(
+        bot, "What rivers meet in Pittsburgh, and what do they form?"
+    )
     print(evaluate_qa(bot))

@@ -5,6 +5,7 @@ first, then:
 
     streamlit run ui/streamlit_app.py
 """
+
 from __future__ import annotations
 
 import base64
@@ -29,7 +30,7 @@ def api(method: str, path: str, **kwargs):
         except ValueError:
             detail = r.text
         raise RuntimeError(f"{method} {path} -> {r.status_code}: {detail}")
-    
+
     return r
 
 
@@ -41,13 +42,12 @@ def show_result(body: dict) -> None:
     if not body.get("answer"):
         st.warning("No speech detected — try again.")
         return
-    
+
     st.markdown(body["answer"])
 
     if body.get("audio_b64"):
-        st.audio(base64.b64decode(body["audio_b64"]), format="audio/wav",
-                 autoplay=True)
-        
+        st.audio(base64.b64decode(body["audio_b64"]), format="audio/wav", autoplay=True)
+
     sources = body.get("sources", [])
 
     if sources:
@@ -64,6 +64,7 @@ def show_result(body: dict) -> None:
         over = " ⚠️ over 3s budget" if total > 3.0 else ""
         st.caption(" · ".join(parts) + f" · **total {total:.2f}s**{over}")
 
+
 with st.sidebar:
     st.subheader("Status")
 
@@ -76,7 +77,7 @@ with st.sidebar:
             f"TTS {'✅' if h['tts_ready'] else '❌'} · "
             f"Vision {'✅' if h.get('vision_ready') else '❌'}"
         )
-        
+
         st.caption(f"{h['indexed_chunks']} chunks indexed")
         service_up = True
     except Exception as e:
@@ -90,32 +91,36 @@ with st.sidebar:
         for name in docs:
             col1, col2 = st.columns([5, 1])
             col1.write(name)
-            
+
             if col2.button("✕", key=f"del_{name}", help=f"Remove {name}"):
                 with st.spinner(f"Removing {name} and rebuilding index…"):
                     api("DELETE", f"/documents/{name}")
-                
+
                 st.rerun()
 
-        uploads = st.file_uploader("Add documents", type=["txt", "md", "pdf"],
-                                   accept_multiple_files=True)
-        
+        uploads = st.file_uploader(
+            "Add documents", type=["txt", "md", "pdf"], accept_multiple_files=True
+        )
+
         if uploads and st.button("Index uploads", type="primary"):
             files = [("files", (f.name, f.getvalue())) for f in uploads]
 
             with st.spinner("Indexing…"):
                 res = api("POST", "/documents", files=files).json()
-            
-            st.success(f"Indexed {res['chunks_added']} chunks "
-                       f"in {res['index_s']:.1f}s")
-            
+
+            st.success(f"Indexed {res['chunks_added']} chunks in {res['index_s']:.1f}s")
+
             st.rerun()
 
         if docs and st.button("Clear all documents"):
             api("DELETE", "/documents")
             st.rerun()
 
-    speak_answers = st.toggle("Speak answers", value=False, help="Return a Piper-synthesized WAV with each answer")
+    speak_answers = st.toggle(
+        "Speak answers",
+        value=False,
+        help="Return a Piper-synthesized WAV with each answer",
+    )
 
 
 # Main: ask by voice or text
@@ -131,7 +136,8 @@ with voice_tab:
     if recording is not None and st.button("Ask", key="ask_voice", type="primary"):
         with st.spinner("Transcribing and answering…"):
             body = api(
-                "POST", "/voice/ask",
+                "POST",
+                "/voice/ask",
                 params={"speak": str(speak_answers).lower()},
                 files={"audio": ("question.wav", recording.getvalue(), "audio/wav")},
             ).json()
@@ -143,21 +149,24 @@ with text_tab:
 
     if st.button("Ask", key="ask_text", type="primary") and question.strip():
         with st.spinner("Answering…"):
-            body = api("POST", "/ask", json={"question": question, "speak": speak_answers}).json()
-            
+            body = api(
+                "POST", "/ask", json={"question": question, "speak": speak_answers}
+            ).json()
+
         show_result(body)
 
 with image_tab:
-    img = st.file_uploader("Image", type=["png", "jpg", "jpeg", "webp"],
-                           key="vision_img")
-    vq = st.text_input("Question about the image (blank = describe)",
-                       key="vision_q")
+    img = st.file_uploader(
+        "Image", type=["png", "jpg", "jpeg", "webp"], key="vision_img"
+    )
+    vq = st.text_input("Question about the image (blank = describe)", key="vision_q")
 
     if img is not None and st.button("Ask", key="ask_vision", type="primary"):
         st.image(img)
         with st.spinner("Looking…"):
             body = api(
-                "POST", "/vision/ask",
+                "POST",
+                "/vision/ask",
                 params={"speak": str(speak_answers).lower()},
                 data={"question": vq},
                 files={"image": (img.name, img.getvalue(), img.type)},

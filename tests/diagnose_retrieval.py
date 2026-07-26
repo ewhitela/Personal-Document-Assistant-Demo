@@ -8,6 +8,7 @@ failing to retrieve it. Run from the project root with the venv active:
 Requires the index to already be built (pdva_store/ populated from a prior
 add_documents() call) so this just opens it read-only — it does not re-index.
 """
+
 import os
 import sys
 
@@ -26,7 +27,9 @@ K = 15
 
 
 def main() -> None:
-    index = DocumentIndex()  # loads existing PERSIST_DIR / COLLECTION_NAME per config.py
+    index = (
+        DocumentIndex()
+    )  # loads existing PERSIST_DIR / COLLECTION_NAME per config.py
 
     print(f"Indexed chunks: {index.count()}\n")
 
@@ -40,7 +43,10 @@ def main() -> None:
             flag = ""
             if "elevation" in p.text.lower() or "feet" in p.text.lower():
                 flag = "  <-- mentions elevation/feet"
-                if "flagstaff lies at" in p.text.lower() or "elevation" in p.text.lower():
+                if (
+                    "flagstaff lies at" in p.text.lower()
+                    or "elevation" in p.text.lower()
+                ):
                     found_elevation = True
             print(f"{i:2d}  score={p.score:.4f}  source={p.source}  {snippet}{flag}")
 

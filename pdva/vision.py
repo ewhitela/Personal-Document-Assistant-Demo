@@ -1,5 +1,3 @@
-
-
 """Week 9 (optional): Visual input with a swappable backend.
 
 Build this only if the pace allows. It answers questions about an image, and it
@@ -25,6 +23,7 @@ Before you start (remote backend):
 
 Run `python tests/test_week9_vision.py` after implementing.
 """
+
 from __future__ import annotations
 
 import base64
@@ -49,13 +48,14 @@ def build_image_message(image_path: str, question: str) -> dict:
 
     return {"role": "user", "content": question, "images": [image_path]}
 
+
 def encode_image_b64(image_path: str) -> str:
     """Read an image file and return its base64-encoded contents as ASCII text.
 
     Used by the remote backend, which must send image bytes over HTTP.
     Behavior: read the file in binary, base64-encode, decode to an ASCII str.
     """
-    
+
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode("ascii")
 
@@ -78,9 +78,12 @@ class VisionBackend(ABC):
 class OllamaVisionBackend(VisionBackend):
     """Local backend: a small vision model served by ollama on this machine."""
 
-    def __init__(self, model: str = config.VISION_MODEL_LOCAL,
-                 host: str = config.LLM_HOST,
-                 temperature: float = config.LLM_TEMPERATURE) -> None:
+    def __init__(
+        self,
+        model: str = config.VISION_MODEL_LOCAL,
+        host: str = config.LLM_HOST,
+        temperature: float = config.LLM_TEMPERATURE,
+    ) -> None:
         """Store config and create self.client = ollama.Client(host=host).
         Do not block or download here.
         """
@@ -113,8 +116,7 @@ class OllamaVisionBackend(VisionBackend):
         response["message"]["content"].
         """
 
-        msg = build_image_message(image_path, question); 
-
+        msg = build_image_message(image_path, question)
         response = self.client.chat(
             model=self.model,
             messages=[msg],
@@ -133,10 +135,13 @@ class RemoteVisionBackend(VisionBackend):
     server; a simple default JSON contract is provided.
     """
 
-    def __init__(self, endpoint: str = config.VISION_REMOTE_URL,
-                 model: str = config.VISION_MODEL_REMOTE,
-                 timeout: int = config.VISION_REMOTE_TIMEOUT,
-                 api_key: str | None = None) -> None:
+    def __init__(
+        self,
+        endpoint: str = config.VISION_REMOTE_URL,
+        model: str = config.VISION_MODEL_REMOTE,
+        timeout: int = config.VISION_REMOTE_TIMEOUT,
+        api_key: str | None = None,
+    ) -> None:
         """Store the endpoint, model, timeout, and optional api_key on self.
         This is plain configuration; nothing to contact yet.
         """
@@ -152,7 +157,7 @@ class RemoteVisionBackend(VisionBackend):
         Default contract:
             {"model": <name>, "question": <text>, "image_b64": <base64 image>}
         """
-        
+
         return {"model": self.model, "question": question, "image_b64": image_b64}
 
     def parse_response(self, data: dict) -> str:
@@ -169,7 +174,7 @@ class RemoteVisionBackend(VisionBackend):
         Behavior: make a lightweight request (a health check, or a HEAD/GET on
         the endpoint) inside try/except and return False on any error.
         """
-        
+
         headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
 
         try:
@@ -177,7 +182,6 @@ class RemoteVisionBackend(VisionBackend):
             return r.status_code < 500
         except Exception:
             return False
-
 
     def ask(self, image_path: str, question: str) -> str:
         """Answer a question about the image via the remote server.
@@ -194,10 +198,13 @@ class RemoteVisionBackend(VisionBackend):
         payload = self.build_payload(question, b64)
         headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
 
-        r = requests.post(self.endpoint, json=payload, headers=headers, timeout=self.timeout)
+        r = requests.post(
+            self.endpoint, json=payload, headers=headers, timeout=self.timeout
+        )
         r.raise_for_status()
 
         return self.parse_response(r.json())
+
 
 # ---------------------------------------------------------------------------
 # Facade the rest of the system uses. Provided, not a stub.
@@ -210,19 +217,25 @@ class VisionModel:
     """
 
     def __init__(self, backend: VisionBackend | None = None) -> None:
-        self.backend: VisionBackend = backend if backend is not None else OllamaVisionBackend()
+        self.backend: VisionBackend = (
+            backend if backend is not None else OllamaVisionBackend()
+        )
 
     @classmethod
-    def local(cls, model: str = config.VISION_MODEL_LOCAL,
-              host: str = config.LLM_HOST) -> VisionModel:
+    def local(
+        cls, model: str = config.VISION_MODEL_LOCAL, host: str = config.LLM_HOST
+    ) -> VisionModel:
         """A VisionModel backed by a local ollama vision model."""
-        
+
         return cls(OllamaVisionBackend(model=model, host=host))
 
     @classmethod
-    def remote(cls, endpoint: str = config.VISION_REMOTE_URL,
-               model: str = config.VISION_MODEL_REMOTE,
-               api_key: str | None = None) -> VisionModel:
+    def remote(
+        cls,
+        endpoint: str = config.VISION_REMOTE_URL,
+        model: str = config.VISION_MODEL_REMOTE,
+        api_key: str | None = None,
+    ) -> VisionModel:
         """A VisionModel backed by a remote HTTP vision server."""
 
         return cls(RemoteVisionBackend(endpoint=endpoint, model=model, api_key=api_key))
@@ -235,4 +248,3 @@ class VisionModel:
 
     def describe(self, image_path: str) -> str:
         return self.ask(image_path, "Describe this image in detail.")
-

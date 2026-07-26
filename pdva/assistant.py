@@ -1,5 +1,3 @@
-
-
 """Week 10: Integration. The orchestrator that runs one turn of the assistant.
 
 Assistant ties every module you built into a single pipeline:
@@ -17,6 +15,7 @@ whole point of this week.
 Run `python tests/test_week10_assistant.py` after implementing. It uses fakes, so
 it runs offline with no models.
 """
+
 from __future__ import annotations
 
 from .types import RAGAnswer
@@ -29,10 +28,10 @@ class Assistant:
         """Store the modules. Dependency injection: pass real modules in the
         service, fakes in the test. `vision` is optional (Week 9).
         """
-        self.transcriber = transcriber   # Week 7: has transcribe(path) -> str
-        self.rag = rag                   # Week 6: has answer(question) -> RAGAnswer
-        self.speaker = speaker           # Week 8: has synthesize(text, path) / say(text)
-        self.vision = vision             # Week 9: has ask(image, question) -> str, or None
+        self.transcriber = transcriber  # Week 7: has transcribe(path) -> str
+        self.rag = rag  # Week 6: has answer(question) -> RAGAnswer
+        self.speaker = speaker  # Week 8: has synthesize(text, path) / say(text)
+        self.vision = vision  # Week 9: has ask(image, question) -> str, or None
 
     def ready(self) -> dict:
         """Return a readiness map for the modules that have is_ready.
@@ -43,17 +42,18 @@ class Assistant:
             and (if present) the vision model. The service exposes this at /health.
         """
         return {
-            "stt": self.transcriber.is_ready() if self.transcriber is not None else False,
+            "stt": self.transcriber.is_ready()
+            if self.transcriber is not None
+            else False,
             "llm": self.rag.llm.is_ready(),
             "tts": self.speaker.is_ready() if self.speaker is not None else False,
             "vision": self.vision.is_ready() if self.vision is not None else False,
         }
 
-
     def answer_text(self, question: str) -> RAGAnswer:
         """Answer a typed question. Behavior: return self.rag.answer(question)."""
         return self.rag.answer(question)
-    
+
     def answer_spoken(self, audio_path: str, out_wav: str | None = None):
         """Answer a spoken question, end to end.
 
@@ -71,12 +71,12 @@ class Assistant:
 
         question = self.transcriber.transcribe(audio_path)
         result = self.answer_text(question)
- 
+
         if out_wav is not None:
             self.speaker.synthesize(result.answer, out_wav)
         else:
             self.speaker.say(result.answer)
- 
+
         return question, result, out_wav
 
     def speak(self, text: str, out_wav: str | None = None):
@@ -98,4 +98,3 @@ class Assistant:
             raise RuntimeError("Vision module not configured for this assistant")
 
         return self.vision.ask(image_path, question)
-

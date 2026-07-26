@@ -14,6 +14,7 @@ Libraries you will import when you implement this:
 Run `python tests/test_week7_stt.py` after implementing. The integration check
 skips cleanly if the model is not available, so the file is always safe to run.
 """
+
 from __future__ import annotations
 
 import logging
@@ -28,6 +29,7 @@ from . import config
 from .types import TranscriptSegment
 
 logger = logging.getLogger(__name__)
+
 
 def join_segments(segments) -> str:
     """Join transcript segments into one clean string.
@@ -50,12 +52,16 @@ def join_segments(segments) -> str:
 
     return " ".join(text.split())
 
+
 class Transcriber:
     """Wraps a faster-whisper model and turns audio files into text."""
 
-    def __init__(self, model_size: str = config.WHISPER_MODEL,
-                 device: str = config.WHISPER_DEVICE,
-                 compute_type: str = config.WHISPER_COMPUTE) -> None:
+    def __init__(
+        self,
+        model_size: str = config.WHISPER_MODEL,
+        device: str = config.WHISPER_DEVICE,
+        compute_type: str = config.WHISPER_COMPUTE,
+    ) -> None:
         """Load the model.
 
         Hint: self.model = WhisperModel(model_size, device=device,
@@ -68,13 +74,12 @@ class Transcriber:
         self.device = device
         self.compute_type = compute_type
         self.model = None
-        
+
         if WhisperModel is None:
             logger.warning("faster-whisper not installed; Transcriber disabled")
             return
-        
-        self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
+        self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
     def is_ready(self) -> bool:
         """Return True if a model is loaded and usable.
@@ -85,7 +90,9 @@ class Transcriber:
 
         return self.model is not None
 
-    def transcribe(self, audio_path: str, beam_size: int = 1, language: str | None = "en") -> str:
+    def transcribe(
+        self, audio_path: str, beam_size: int = 1, language: str | None = "en"
+    ) -> str:
         """Transcribe an audio file to a single text string.
 
         Behavior:
@@ -97,19 +104,22 @@ class Transcriber:
 
         if not self.is_ready():
             raise RuntimeError("Transcriber model is not loaded")
-        
+
         if not Path(audio_path).exists():
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
-        
-        segments, info = self.model.transcribe(audio_path, beam_size=beam_size, language=language)
-        
+
+        segments, info = self.model.transcribe(
+            audio_path, beam_size=beam_size, language=language
+        )
+
         joined = join_segments(segments)
         logger.debug("transcribed (lang=%s): %s", info.language, joined)
 
         return joined
 
-
-    def transcribe_segments(self, audio_path: str, beam_size: int = 1) -> list[TranscriptSegment]:
+    def transcribe_segments(
+        self, audio_path: str, beam_size: int = 1
+    ) -> list[TranscriptSegment]:
         """Transcribe and return timed segments.
 
         Returns:
@@ -124,4 +134,6 @@ class Transcriber:
 
         segments, _info = self.model.transcribe(audio_path, beam_size=beam_size)
 
-        return [TranscriptSegment(start=s.start, end=s.end, text=s.text) for s in segments]
+        return [
+            TranscriptSegment(start=s.start, end=s.end, text=s.text) for s in segments
+        ]

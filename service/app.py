@@ -47,6 +47,7 @@ SUPPORTED_DOCS = {".txt", ".md", ".pdf"}
 SUPPORTED_AUDIO = {".wav", ".mp3", ".m4a", ".flac", ".ogg", ".webm"}
 SUPPORTED_IMAGES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
 
+
 @dataclass
 class Components:
     # `index` stays separate: Assistant has no reference to it (it only holds
@@ -95,7 +96,9 @@ def build_components() -> Components:
     except Exception:
         logger.exception("Vision failed to load; /vision/ask disabled")
 
-    assistant = Assistant(transcriber=transcriber, rag=pipeline, speaker=speaker, vision=vision)
+    assistant = Assistant(
+        transcriber=transcriber, rag=pipeline, speaker=speaker, vision=vision
+    )
     return Components(index=index, assistant=assistant)
 
 
@@ -108,25 +111,33 @@ def reindex_docs_dir(comp: Components) -> int:
     """
     comp.index.reset()
 
-    paths = sorted(str(p) for p in DOCS_DIR.iterdir()
-                   if p.suffix.lower() in SUPPORTED_DOCS)
+    paths = sorted(
+        str(p) for p in DOCS_DIR.iterdir() if p.suffix.lower() in SUPPORTED_DOCS
+    )
 
     return comp.index.add_documents(paths) if paths else 0
 
 
-
 # Schemas
+
 
 class AskRequest(BaseModel):
     question: str
     speak: bool = False
 
+
 class SpeakRequest(BaseModel):
     text: str
 
+
 def _passage_dict(p) -> dict:
-    return {"source": p.source, "score": round(p.score, 4),
-            "chunk_id": p.chunk_id, "text": p.text}
+    return {
+        "source": p.source,
+        "score": round(p.score, 4),
+        "chunk_id": p.chunk_id,
+        "text": p.text,
+    }
+
 
 def create_app(components: Components | None = None) -> FastAPI:
     @asynccontextmanager
@@ -172,17 +183,23 @@ def create_app(components: Components | None = None) -> FastAPI:
         text, report = verify(text, passages, question)
         t3 = time.perf_counter()
 
-        timings = {"retrieve_s": round(t1 - t0, 3),
-                   "generate_s": round(t2 - t1, 3),
-                   "verify_s": round(t3 - t2, 3)}
+        timings = {
+            "retrieve_s": round(t1 - t0, 3),
+            "generate_s": round(t2 - t1, 3),
+            "verify_s": round(t3 - t2, 3),
+        }
 
-        body = {"answer": text,
-                "sources": [_passage_dict(p) for p in passages],
-                "verification": {"passed": report.passed,
-                                 "abstained": report.abstained,
-                                 "ungrounded_numbers": report.ungrounded,
-                                 "ungrounded_entities": report.ungrounded_entities,
-                                 "status_stripped": report.status_stripped}}
+        body = {
+            "answer": text,
+            "sources": [_passage_dict(p) for p in passages],
+            "verification": {
+                "passed": report.passed,
+                "abstained": report.abstained,
+                "ungrounded_numbers": report.ungrounded,
+                "ungrounded_entities": report.ungrounded_entities,
+                "status_stripped": report.status_stripped,
+            },
+        }
 
         return body, timings
 
@@ -204,7 +221,9 @@ def create_app(components: Components | None = None) -> FastAPI:
         finally:
             os.remove(path)
 
-        return base64.b64encode(data).decode("ascii"), round(time.perf_counter() - t0, 3)
+        return base64.b64encode(data).decode("ascii"), round(
+            time.perf_counter() - t0, 3
+        )
 
     @app.get("/health")
     def health():
@@ -221,8 +240,9 @@ def create_app(components: Components | None = None) -> FastAPI:
 
     @app.get("/documents")
     def list_documents():
-        files = sorted(p.name for p in DOCS_DIR.iterdir()
-                       if p.suffix.lower() in SUPPORTED_DOCS)
+        files = sorted(
+            p.name for p in DOCS_DIR.iterdir() if p.suffix.lower() in SUPPORTED_DOCS
+        )
 
         return {"documents": files, "chunks": comp().index.count()}
 
@@ -234,8 +254,11 @@ def create_app(components: Components | None = None) -> FastAPI:
             name = Path(f.filename or "").name
 
             if not name or Path(name).suffix.lower() not in SUPPORTED_DOCS:
-                raise HTTPException(400, f"Unsupported file type: {f.filename!r} "
-                                         f"(supported: {sorted(SUPPORTED_DOCS)})")
+                raise HTTPException(
+                    400,
+                    f"Unsupported file type: {f.filename!r} "
+                    f"(supported: {sorted(SUPPORTED_DOCS)})",
+                )
 
             dest = DOCS_DIR / name
 
@@ -247,9 +270,11 @@ def create_app(components: Components | None = None) -> FastAPI:
         t0 = time.perf_counter()
         chunks = comp().index.add_documents(saved)
 
-        return {"added": [Path(p).name for p in saved],
-                "chunks_added": chunks,
-                "index_s": round(time.perf_counter() - t0, 3)}
+        return {
+            "added": [Path(p).name for p in saved],
+            "chunks_added": chunks,
+            "index_s": round(time.perf_counter() - t0, 3),
+        }
 
     @app.delete("/documents/{filename}")
     def delete_document(filename: str):
@@ -314,8 +339,12 @@ def create_app(components: Components | None = None) -> FastAPI:
             os.remove(path)
 
         if not transcript.strip():
-            return {"transcript": "", "answer": "", "sources": [],
-                    "timings": {"stt_s": stt_s, "total_s": stt_s}}
+            return {
+                "transcript": "",
+                "answer": "",
+                "sources": [],
+                "timings": {"stt_s": stt_s, "total_s": stt_s},
+            }
 
         body, timings = answer_with_timings(transcript)
         timings = {"stt_s": stt_s, **timings}
@@ -330,8 +359,9 @@ def create_app(components: Components | None = None) -> FastAPI:
         return body
 
     @app.post("/vision/ask")
-    def vision_ask(image: UploadFile = File(...), question: str = Form(""),
-                   speak: bool = False):
+    def vision_ask(
+        image: UploadFile = File(...), question: str = Form(""), speak: bool = False
+    ):
         c = comp()
         if c.assistant.vision is None:
             raise HTTPException(503, "Vision not available (moondream not loaded)")

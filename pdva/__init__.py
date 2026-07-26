@@ -13,6 +13,7 @@ You build these modules across Weeks 4 to 9:
 The signatures are fixed so the modules plug into each other and into the
 Week 10 service without changes. Fill in the bodies marked NotImplementedError.
 """
+
 from .assistant import Assistant
 from .embedding_index import DocumentIndex
 from .llm import LocalLLM

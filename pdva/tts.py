@@ -1,5 +1,3 @@
-
-
 """Week 8: Text-to-speech via Piper.
 
 You implement every function and method marked `raise NotImplementedError`.
@@ -23,6 +21,7 @@ licensed GPL-3.0, which matters if this is ever redistributed.
 Run `python tests/test_week8_tts.py` after implementing. The integration check
 skips cleanly if Piper or the voice file is missing.
 """
+
 from __future__ import annotations
 
 import logging
@@ -45,12 +44,16 @@ from . import config
 
 logger = logging.getLogger(__name__)
 
-_SYN_CONFIG = SynthesisConfig(
-    length_scale=1.05,
-    noise_scale=0.75,
-    noise_w_scale=0.85,
-    normalize_audio=True,
-) if SynthesisConfig else None
+_SYN_CONFIG = (
+    SynthesisConfig(
+        length_scale=1.05,
+        noise_scale=0.75,
+        noise_w_scale=0.85,
+        normalize_audio=True,
+    )
+    if SynthesisConfig
+    else None
+)
 
 
 def split_sentences(text: str) -> list[str]:
@@ -69,7 +72,7 @@ def split_sentences(text: str) -> list[str]:
           block, and short pieces let playback start sooner.
     """
 
-    pieces = re.split(r'([.!?]+)', text)
+    pieces = re.split(r"([.!?]+)", text)
 
     sentences = []
     for i in range(0, len(pieces) - 1, 2):
@@ -84,11 +87,15 @@ def split_sentences(text: str) -> list[str]:
 
     return sentences
 
+
 class Speaker:
     """Wraps a Piper voice and turns text into speech."""
 
-    def __init__(self, voice_path: str = config.PIPER_VOICE,
-                 use_cuda: bool = config.PIPER_USE_CUDA) -> None:
+    def __init__(
+        self,
+        voice_path: str = config.PIPER_VOICE,
+        use_cuda: bool = config.PIPER_USE_CUDA,
+    ) -> None:
         """Load the voice model.
 
         Hint: self.voice = PiperVoice.load(voice_path, use_cuda=use_cuda). The
@@ -115,7 +122,7 @@ class Speaker:
         Return False (do not raise) if Piper is missing or the voice file is not
         found, so callers can fall back to on-screen text.
         """
-        
+
         return self.voice is not None
 
     def synthesize(self, text: str, out_path: str) -> str:
@@ -129,12 +136,12 @@ class Speaker:
 
         if not self.is_ready():
             raise RuntimeError("Speaker voice is not loaded")
-        
+
         with wave.open(out_path, "wb") as wav_file:
             self.voice.synthesize_wav(text, wav_file, syn_config=_SYN_CONFIG)
 
         return out_path
-    
+
     def say(self, text: str) -> None:
         """Synthesize text and play it through the speakers.
 
@@ -146,7 +153,7 @@ class Speaker:
 
         if not self.is_ready():
             raise RuntimeError("Speaker voice is not loaded")
-        
+
         if not text.strip():
             return
 
@@ -163,4 +170,3 @@ class Speaker:
                 time.sleep(0.45)
             finally:
                 os.remove(out_path)
-

@@ -33,14 +33,14 @@ import time
 import numpy as np
 
 SAMPLE_RATE = 16_000
-CHUNK = 1280                 # 80 ms — the frame size openWakeWord expects
-VAD_FRAME = 480              # 30 ms — a frame size webrtcvad accepts
-BYTES_PER_SAMPLE = 2         # int16 mono
+CHUNK = 1280  # 80 ms — the frame size openWakeWord expects
+VAD_FRAME = 480  # 30 ms — a frame size webrtcvad accepts
+BYTES_PER_SAMPLE = 2  # int16 mono
 
 WAKE_THRESHOLD = 0.5
-PREROLL_CHUNKS = 5           # ~0.4 s of audio kept from before speech starts
-TRAILING_SILENCE_MS = 800    # end of utterance after this much silence
-LEADING_TIMEOUT_S = 6.0      # give up if no speech follows the wake word
+PREROLL_CHUNKS = 5  # ~0.4 s of audio kept from before speech starts
+TRAILING_SILENCE_MS = 800  # end of utterance after this much silence
+LEADING_TIMEOUT_S = 6.0  # give up if no speech follows the wake word
 MAX_UTTERANCE_S = 15.0
 
 
@@ -52,12 +52,13 @@ def iter_vad_frames(carry: bytes, chunk: bytes):
     buf = carry + chunk
     frame_bytes = VAD_FRAME * BYTES_PER_SAMPLE
     n = len(buf) // frame_bytes
-    frames = [buf[i * frame_bytes:(i + 1) * frame_bytes] for i in range(n)]
-    return frames, buf[n * frame_bytes:]
+    frames = [buf[i * frame_bytes : (i + 1) * frame_bytes] for i in range(n)]
+    return frames, buf[n * frame_bytes :]
 
 
 def load_whisper(model_size: str):
     from faster_whisper import WhisperModel
+
     for device, compute in (("cuda", "int8"), ("cpu", "int8")):
         try:
             model = WhisperModel(model_size, device=device, compute_type=compute)
@@ -71,6 +72,7 @@ def load_whisper(model_size: str):
 def load_wakeword(name: str):
     import openwakeword
     from openwakeword.model import Model
+
     openwakeword.utils.download_models([name])  # no-op if already cached
     model = Model(wakeword_models=[name], inference_framework="onnx")
     print(f"[wakeword] listening for '{name.replace('_', ' ')}'")
@@ -116,8 +118,10 @@ def transcribe(whisper, audio_int16: np.ndarray) -> str:
     t0 = time.monotonic()
     segments, _info = whisper.transcribe(audio, beam_size=1, language="en")
     text = " ".join(s.text.strip() for s in segments).strip()
-    print(f"[whisper] transcribed {audio.size / SAMPLE_RATE:.1f}s of audio "
-          f"in {time.monotonic() - t0:.2f}s")
+    print(
+        f"[whisper] transcribed {audio.size / SAMPLE_RATE:.1f}s of audio "
+        f"in {time.monotonic() - t0:.2f}s"
+    )
     return text
 
 
@@ -131,9 +135,13 @@ def drain(q: queue.Queue):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--model", default="small", help="faster-whisper size (default: small)")
+    ap.add_argument(
+        "--model", default="small", help="faster-whisper size (default: small)"
+    )
     ap.add_argument("--wakeword", default="hey_jarvis", help="openWakeWord model name")
-    ap.add_argument("--push-to-talk", action="store_true", help="Enter key instead of wake word")
+    ap.add_argument(
+        "--push-to-talk", action="store_true", help="Enter key instead of wake word"
+    )
     ap.add_argument("--device", type=int, default=None, help="input device index")
     ap.add_argument("--list-devices", action="store_true")
     args = ap.parse_args()
@@ -145,6 +153,7 @@ def main():
         return
 
     import webrtcvad
+
     vad = webrtcvad.Vad(2)  # 0 = permissive .. 3 = aggressive
     whisper = load_whisper(args.model)
     wake = None if args.push_to_talk else load_wakeword(args.wakeword)
@@ -158,8 +167,14 @@ def main():
 
     preroll = collections.deque(maxlen=PREROLL_CHUNKS)
 
-    with sd.InputStream(samplerate=SAMPLE_RATE, channels=1, dtype="int16",
-                        blocksize=CHUNK, device=args.device, callback=callback):
+    with sd.InputStream(
+        samplerate=SAMPLE_RATE,
+        channels=1,
+        dtype="int16",
+        blocksize=CHUNK,
+        device=args.device,
+        callback=callback,
+    ):
         print("[demo] ready. Ctrl+C to quit.")
         while True:
             if args.push_to_talk:

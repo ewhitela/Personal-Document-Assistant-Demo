@@ -72,14 +72,14 @@ def extract_text(path: str) -> str:
 
     if ext == ".pdf":
         reader = PdfReader(path)
-        return clean_text("\n".join((page.extract_text() or "") for page in reader.pages))
+        return clean_text(
+            "\n".join((page.extract_text() or "") for page in reader.pages)
+        )
     elif ext in (".md", ".txt"):
         with open(path, encoding="utf-8") as f:
             return clean_text(f.read())
     else:
         raise ValueError(f"Unsupported file type: {ext}")
-    
-
 
 
 def chunk_text(

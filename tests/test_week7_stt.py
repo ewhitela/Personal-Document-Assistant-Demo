@@ -1,5 +1,3 @@
-
-
 """Sanity tests for the Week 7 Transcriber.
 
     python tests/test_week7_stt.py
@@ -9,6 +7,7 @@ The transcription check needs the faster-whisper model and a sample audio file;
 it SKIPs cleanly when either is missing, so the file is always safe to run. To
 exercise it, drop a short spoken-word clip at tests/data/sample.wav.
 """
+
 import os
 import sys
 
@@ -19,6 +18,7 @@ from pdva.transcriber import Transcriber, join_segments
 
 class _Seg:
     """Mimics a faster-whisper segment: it has a .text attribute."""
+
     def __init__(self, text):
         self.text = text
 
@@ -37,10 +37,14 @@ def test_transcribe_sample():
         return "skip"
     sample = os.path.join(os.path.dirname(__file__), "data", "sample.wav")
     if not os.path.exists(sample):
-        print("   note: no tests/data/sample.wav found; record a short clip to exercise this.")
+        print(
+            "   note: no tests/data/sample.wav found; record a short clip to exercise this."
+        )
         return "skip"
     text = t.transcribe(sample)
-    assert isinstance(text, str) and text.strip(), "transcribe should return non-empty text"
+    assert isinstance(text, str) and text.strip(), (
+        "transcribe should return non-empty text"
+    )
 
 
 def _run():
@@ -49,13 +53,17 @@ def _run():
         if name.startswith("test_") and callable(fn):
             try:
                 r = fn()
-                status = r.upper() if isinstance(r, str) and r in ("skip", "warn") else "PASS"
+                status = (
+                    r.upper()
+                    if isinstance(r, str) and r in ("skip", "warn")
+                    else "PASS"
+                )
                 results.append((status, name, ""))
             except NotImplementedError:
                 results.append(("TODO", name, "not implemented yet"))
             except AssertionError as e:
                 results.append(("FAIL", name, str(e)))
-            except Exception as e:  # noqa: BLE001
+            except Exception as e:
                 results.append(("ERROR", name, repr(e)))
     w = max(len(n) for _, n, _ in results)
     hard = 0
@@ -63,9 +71,14 @@ def _run():
         print(f"{s:5s} {n:<{w}}  {msg}")
         if s in ("FAIL", "ERROR"):
             hard += 1
-    print("\n" + ", ".join(f"{s}={sum(1 for x, _, _ in results if x == s)}"
-                           for s in ["PASS", "SKIP", "WARN", "TODO", "FAIL", "ERROR"]
-                           if any(x == s for x, _, _ in results)))
+    print(
+        "\n"
+        + ", ".join(
+            f"{s}={sum(1 for x, _, _ in results if x == s)}"
+            for s in ["PASS", "SKIP", "WARN", "TODO", "FAIL", "ERROR"]
+            if any(x == s for x, _, _ in results)
+        )
+    )
     raise SystemExit(1 if hard else 0)
 
 

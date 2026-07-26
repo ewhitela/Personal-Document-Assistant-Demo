@@ -29,6 +29,7 @@ v2: adds two checks the first version missed.
    It is not general relation extraction and won't catch inverted relations
    phrased differently.
 """
+
 from __future__ import annotations
 
 import re
@@ -42,16 +43,44 @@ _SENT_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z\"'])")
 
 _STATUS_RE = re.compile(
     r"\b(still|today|currently|to this day|remains?|continues?|no longer|"
-    r"nowadays|anymore|as of (?:now|today))\b", re.IGNORECASE)
+    r"nowadays|anymore|as of (?:now|today))\b",
+    re.IGNORECASE,
+)
 _STATUS_QUESTION_RE = re.compile(
     r"\b(still (?:exist|stand|true|there|in effect|operat)|today|currently|"
-    r"anymore|these days)\b", re.IGNORECASE)
+    r"anymore|these days)\b",
+    re.IGNORECASE,
+)
 _STATUS_CLAUSE = "The documents don't state its current status."
 
 _WORD_RE = re.compile(r"[A-Za-z][A-Za-z.\-']*")
-_STOP_CAPS = {"I", "The", "A", "An", "It", "This", "That", "These", "Those",
-              "However", "According", "Unlike", "Since", "There", "No", "Her",
-              "His", "Its", "Their", "In", "On", "At", "As", "But", "And"}
+_STOP_CAPS = {
+    "I",
+    "The",
+    "A",
+    "An",
+    "It",
+    "This",
+    "That",
+    "These",
+    "Those",
+    "However",
+    "According",
+    "Unlike",
+    "Since",
+    "There",
+    "No",
+    "Her",
+    "His",
+    "Its",
+    "Their",
+    "In",
+    "On",
+    "At",
+    "As",
+    "But",
+    "And",
+}
 _CONNECTORS = {"of", "the", "and", "for", "de", "du"}
 
 # Citation clauses: "According to passage [2], ", "Per source [1] and [3], ".
@@ -88,8 +117,15 @@ _COMPARISON_RE = re.compile(
     rf"(?P<ord>{_ORDINAL_WORDS})[\s-]*most\s+(?P<adj>[a-z]+)\s+(?P<noun>[a-z]+)\s+in\s+"
     rf"(?P<scope>{_CAP_PHRASE})\s+(?P<rel>after|before)\s+(?P<obj>{_CAP_PHRASE})",
 )
-_ORDINAL_ALIASES = {"1st": "first", "2nd": "second", "3rd": "third",
-                     "4th": "fourth", "5th": "fifth", "6th": "sixth", "7th": "seventh"}
+_ORDINAL_ALIASES = {
+    "1st": "first",
+    "2nd": "second",
+    "3rd": "third",
+    "4th": "fourth",
+    "5th": "fifth",
+    "6th": "sixth",
+    "7th": "seventh",
+}
 
 
 def _norm_ordinal(o: str) -> str:
@@ -175,12 +211,14 @@ def _entity_anchors(sentence: str) -> list[str]:
     to a specific subject (skips the sentence-initial word, which may just
     be capitalized for grammar)."""
     words = _words(sentence)
-    return [w for w in words[1:]
-            if w[:1].isupper() and w not in _STOP_CAPS and len(w) >= 3]
+    return [
+        w for w in words[1:] if w[:1].isupper() and w not in _STOP_CAPS and len(w) >= 3
+    ]
 
 
-def _anchors_present(anchors: list[str], words_set: set[str],
-                      initials_set: set[str]) -> bool:
+def _anchors_present(
+    anchors: list[str], words_set: set[str], initials_set: set[str]
+) -> bool:
     """All anchors must be supported by this one passage."""
     for a in anchors:
         key = a.rstrip(".-'").lower()
@@ -192,8 +230,9 @@ def _anchors_present(anchors: list[str], words_set: set[str],
     return True
 
 
-def _ungrounded_entities(sentence: str, grounding_lower_words: set[str],
-                         corpus_initials: set[str]) -> list[str]:
+def _ungrounded_entities(
+    sentence: str, grounding_lower_words: set[str], corpus_initials: set[str]
+) -> list[str]:
     bad = []
     for w in _entity_anchors(sentence):
         key = w.rstrip(".-'").lower()
@@ -208,31 +247,40 @@ def _ungrounded_entities(sentence: str, grounding_lower_words: set[str],
 @dataclass
 class Verification:
     """What the check did, for eval logs and the Week 12 report."""
-    passed: bool                      # True = output identical to input
-    abstained: bool = False           # True = whole answer replaced
-    ungrounded: list[str] = field(default_factory=list)          # fabricated numbers
-    conflated: list[str] = field(default_factory=list)           # real numbers, wrong entity
-    stripped: list[str] = field(default_factory=list)             # removed sentences
+
+    passed: bool  # True = output identical to input
+    abstained: bool = False  # True = whole answer replaced
+    ungrounded: list[str] = field(default_factory=list)  # fabricated numbers
+    conflated: list[str] = field(default_factory=list)  # real numbers, wrong entity
+    stripped: list[str] = field(default_factory=list)  # removed sentences
     ungrounded_entities: list[str] = field(default_factory=list)
     status_stripped: bool = False
     citations_stripped: list[str] = field(default_factory=list)  # e.g. ["[2]"]
-    inversions: list[str] = field(default_factory=list)           # reversed comparisons
+    inversions: list[str] = field(default_factory=list)  # reversed comparisons
 
 
-def verify(answer: str, passages: Iterable, question: str = "") -> tuple[str, Verification]:
+def verify(
+    answer: str, passages: Iterable, question: str = ""
+) -> tuple[str, Verification]:
     if answer.strip() == ABSTAIN:
         return answer, Verification(passed=True, abstained=True)
 
     passage_texts = [p.text for p in passages]
     passage_nums = [_extract_numbers(t) for t in passage_texts]
-    passage_words = [{w.rstrip(".-'").lower() for w in _words(t)} for t in passage_texts]
-    passage_initials = [{"".join(w[0].upper() for w in seq) for seq in _cap_sequences(t)}
-                         for t in passage_texts]
+    passage_words = [
+        {w.rstrip(".-'").lower() for w in _words(t)} for t in passage_texts
+    ]
+    passage_initials = [
+        {"".join(w[0].upper() for w in seq) for seq in _cap_sequences(t)}
+        for t in passage_texts
+    ]
 
     context = " ".join(passage_texts)
     grounding = context + " " + question
     grounding_words = {w.rstrip(".-'").lower() for w in _words(grounding)}
-    corpus_initials = {"".join(w[0].upper() for w in seq) for seq in _cap_sequences(grounding)}
+    corpus_initials = {
+        "".join(w[0].upper() for w in seq) for seq in _cap_sequences(grounding)
+    }
     context_has_status = bool(_STATUS_RE.search(context))
     status_question = bool(_STATUS_QUESTION_RE.search(question))
 
@@ -255,7 +303,8 @@ def verify(answer: str, passages: Iterable, question: str = "") -> tuple[str, Ve
             if not anchors:
                 continue  # nothing to attribute to; presence is all we can check
             co_located = any(
-                num in passage_nums[i] and _anchors_present(anchors, passage_words[i], passage_initials[i])
+                num in passage_nums[i]
+                and _anchors_present(anchors, passage_words[i], passage_initials[i])
                 for i in range(len(passage_texts))
             )
             if not co_located:
@@ -287,7 +336,7 @@ def verify(answer: str, passages: Iterable, question: str = "") -> tuple[str, Ve
     if status_question and rep.status_stripped and text != ABSTAIN:
         text = text.rstrip() + " " + _STATUS_CLAUSE
 
-    rep.passed = (text == answer.strip())
+    rep.passed = text == answer.strip()
     return text, rep
 
 
