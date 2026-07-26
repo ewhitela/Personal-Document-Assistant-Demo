@@ -37,10 +37,10 @@ except ImportError:
     PiperVoice = None
     SynthesisConfig = None
 
+from . import config
+
 import sounddevice as sd
 import soundfile as sf
-
-from . import config
 
 logger = logging.getLogger(__name__)
 
