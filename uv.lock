@@ -1286,6 +1286,7 @@ voice = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "pytest" },
     { name = "ruff" },
 ]
 
@@ -1312,7 +1313,10 @@ requires-dist = [
 provides-extras = ["voice", "dev"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "ruff", specifier = ">=0.16.0" }]
+dev = [
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "ruff", specifier = ">=0.16.0" },
+]
 
 [[package]]
 name = "pillow"
