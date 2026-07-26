@@ -27,10 +27,8 @@ DOCS = {
 
 
 def _write_docs(folder):
-    paths = [
-        "/home/ra/Downloads/Nova Ircutia - Starlit Isles Wiki.pdf",
-        "/home/ra/Downloads/Olympia - Starlit Isles Wiki.pdf",
-    ]
+    paths = []
+    
     for name, text in DOCS.items():
         p = os.path.join(folder, name)
         with open(p, "w", encoding="utf-8") as f:
