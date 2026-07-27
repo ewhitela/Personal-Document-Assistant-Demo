@@ -61,12 +61,12 @@ SUPPORTED_IMAGES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
 
 # Wake-word audio constants (mirrors voice_demo.py).
 WAKE_SAMPLE_RATE = 16000
-WAKE_OWW_FRAME_SAMPLES = 1280          # openWakeWord requires 80ms int16 frames
-WAKE_VAD_FRAME_MS = 30                 # webrtcvad only accepts 10/20/30ms
+WAKE_OWW_FRAME_SAMPLES = 1280  # openWakeWord requires 80ms int16 frames
+WAKE_VAD_FRAME_MS = 30  # webrtcvad only accepts 10/20/30ms
 WAKE_VAD_FRAME_SAMPLES = WAKE_SAMPLE_RATE * WAKE_VAD_FRAME_MS // 1000
 WAKE_THRESHOLD = 0.5
-WAKE_SILENCE_FRAMES_TO_STOP = int(0.8 * 1000 / WAKE_VAD_FRAME_MS)   # ~0.8s silence
-WAKE_MAX_UTTERANCE_FRAMES = int(15 * 1000 / WAKE_VAD_FRAME_MS)      # 15s hard cap
+WAKE_SILENCE_FRAMES_TO_STOP = int(0.8 * 1000 / WAKE_VAD_FRAME_MS)  # ~0.8s silence
+WAKE_MAX_UTTERANCE_FRAMES = int(15 * 1000 / WAKE_VAD_FRAME_MS)  # 15s hard cap
 WAKE_VAD_AGGRESSIVENESS = 2
 
 
@@ -118,7 +118,9 @@ def build_components() -> Components:
     except Exception:
         logger.exception("Vision failed to load; /vision/ask disabled")
 
-    assistant = Assistant(transcriber=transcriber, rag=pipeline, speaker=speaker, vision=vision)
+    assistant = Assistant(
+        transcriber=transcriber, rag=pipeline, speaker=speaker, vision=vision
+    )
     return Components(index=index, assistant=assistant)
 
 
@@ -131,15 +133,20 @@ def reindex_docs_dir(comp: Components) -> int:
     """
     comp.index.reset()
 
-    paths = sorted(str(p) for p in DOCS_DIR.iterdir()
-                   if p.suffix.lower() in SUPPORTED_DOCS)
+    paths = sorted(
+        str(p) for p in DOCS_DIR.iterdir() if p.suffix.lower() in SUPPORTED_DOCS
+    )
 
     return comp.index.add_documents(paths) if paths else 0
 
 
 def _passage_dict(p) -> dict:
-    return {"source": p.source, "score": round(p.score, 4),
-            "chunk_id": p.chunk_id, "text": p.text}
+    return {
+        "source": p.source,
+        "score": round(p.score, 4),
+        "chunk_id": p.chunk_id,
+        "text": p.text,
+    }
 
 
 # -- Shared answer/speak helpers --------------------------------------------
@@ -147,6 +154,7 @@ def _passage_dict(p) -> dict:
 # background thread can call the exact same retrieve/generate/verify path as
 # /ask and /voice/ask -- one code path, one set of timings, no drift between
 # the three entry points.
+
 
 def answer_with_timings(c: Components, question: str) -> tuple[dict, dict]:
     """Retrieve + generate, timed as two stages.
@@ -173,17 +181,23 @@ def answer_with_timings(c: Components, question: str) -> tuple[dict, dict]:
     text, report = verify(text, passages, question)
     t3 = time.perf_counter()
 
-    timings = {"retrieve_s": round(t1 - t0, 3),
-               "generate_s": round(t2 - t1, 3),
-               "verify_s": round(t3 - t2, 3)}
+    timings = {
+        "retrieve_s": round(t1 - t0, 3),
+        "generate_s": round(t2 - t1, 3),
+        "verify_s": round(t3 - t2, 3),
+    }
 
-    body = {"answer": text,
-            "sources": [_passage_dict(p) for p in passages],
-            "verification": {"passed": report.passed,
-                             "abstained": report.abstained,
-                             "ungrounded_numbers": report.ungrounded,
-                             "ungrounded_entities": report.ungrounded_entities,
-                             "status_stripped": report.status_stripped}}
+    body = {
+        "answer": text,
+        "sources": [_passage_dict(p) for p in passages],
+        "verification": {
+            "passed": report.passed,
+            "abstained": report.abstained,
+            "ungrounded_numbers": report.ungrounded,
+            "ungrounded_entities": report.ungrounded_entities,
+            "status_stripped": report.status_stripped,
+        },
+    }
 
     return body, timings
 
@@ -294,9 +308,13 @@ class WakeListener:
             q.put(indata.copy())
 
         try:
-            stream = sd.InputStream(samplerate=WAKE_SAMPLE_RATE, channels=1,
-                                     dtype="int16", blocksize=WAKE_VAD_FRAME_SAMPLES,
-                                     callback=callback)
+            stream = sd.InputStream(
+                samplerate=WAKE_SAMPLE_RATE,
+                channels=1,
+                dtype="int16",
+                blocksize=WAKE_VAD_FRAME_SAMPLES,
+                callback=callback,
+            )
         except Exception as e:
             self.state = f"error: could not open microphone ({e})"
             return
@@ -310,7 +328,9 @@ class WakeListener:
                 frame_count = 0
 
                 while not self._stop.is_set():
-                    frame, leftover = self._read_frame(q, WAKE_OWW_FRAME_SAMPLES, leftover)
+                    frame, leftover = self._read_frame(
+                        q, WAKE_OWW_FRAME_SAMPLES, leftover
+                    )
                     if frame is None:
                         break
 
@@ -322,8 +342,11 @@ class WakeListener:
                     # server console whether audio is reaching the model at
                     # all, without needing the Streamlit UI open.
                     if frame_count % 12 == 0:
-                        logger.info("wake listener score=%.3f (threshold=%.2f)",
-                                     self.last_score, WAKE_THRESHOLD)
+                        logger.info(
+                            "wake listener score=%.3f (threshold=%.2f)",
+                            self.last_score,
+                            WAKE_THRESHOLD,
+                        )
 
                     if score < WAKE_THRESHOLD:
                         continue
@@ -334,14 +357,19 @@ class WakeListener:
                     n = 0
 
                     while n < WAKE_MAX_UTTERANCE_FRAMES and not self._stop.is_set():
-                        vframe, leftover = self._read_frame(q, WAKE_VAD_FRAME_SAMPLES, leftover)
+                        vframe, leftover = self._read_frame(
+                            q, WAKE_VAD_FRAME_SAMPLES, leftover
+                        )
                         if vframe is None:
                             break
                         frames.append(vframe)
                         is_speech = vad.is_speech(vframe.tobytes(), WAKE_SAMPLE_RATE)
                         silence_run = 0 if is_speech else silence_run + 1
                         n += 1
-                        if silence_run >= WAKE_SILENCE_FRAMES_TO_STOP and n > silence_run:
+                        if (
+                            silence_run >= WAKE_SILENCE_FRAMES_TO_STOP
+                            and n > silence_run
+                        ):
                             break
 
                     if self._stop.is_set() or not frames:
@@ -377,8 +405,14 @@ class WakeListener:
             os.remove(path)
 
         if not transcript.strip():
-            self.results.put({"transcript": "", "answer": "", "sources": [],
-                               "timings": {"stt_s": stt_s, "total_s": stt_s}})
+            self.results.put(
+                {
+                    "transcript": "",
+                    "answer": "",
+                    "sources": [],
+                    "timings": {"stt_s": stt_s, "total_s": stt_s},
+                }
+            )
             return
 
         body, timings = answer_with_timings(self.comp, transcript)
@@ -386,7 +420,9 @@ class WakeListener:
 
         if self.speak:
             try:
-                body["audio_b64"], timings["tts_s"] = synthesize_b64(self.comp, body["answer"])
+                body["audio_b64"], timings["tts_s"] = synthesize_b64(
+                    self.comp, body["answer"]
+                )
             except HTTPException:
                 pass  # TTS unavailable; still surface the text answer
 
@@ -398,9 +434,11 @@ class WakeListener:
 
 # Schemas
 
+
 class AskRequest(BaseModel):
     question: str
     speak: bool = False
+
 
 class SpeakRequest(BaseModel):
     text: str
@@ -445,8 +483,9 @@ def create_app(components: Components | None = None) -> FastAPI:
 
     @app.get("/documents")
     def list_documents():
-        files = sorted(p.name for p in DOCS_DIR.iterdir()
-                       if p.suffix.lower() in SUPPORTED_DOCS)
+        files = sorted(
+            p.name for p in DOCS_DIR.iterdir() if p.suffix.lower() in SUPPORTED_DOCS
+        )
 
         return {"documents": files, "chunks": comp().index.count()}
 
@@ -458,8 +497,11 @@ def create_app(components: Components | None = None) -> FastAPI:
             name = Path(f.filename or "").name
 
             if not name or Path(name).suffix.lower() not in SUPPORTED_DOCS:
-                raise HTTPException(400, f"Unsupported file type: {f.filename!r} "
-                                         f"(supported: {sorted(SUPPORTED_DOCS)})")
+                raise HTTPException(
+                    400,
+                    f"Unsupported file type: {f.filename!r} "
+                    f"(supported: {sorted(SUPPORTED_DOCS)})",
+                )
 
             dest = DOCS_DIR / name
 
@@ -471,9 +513,11 @@ def create_app(components: Components | None = None) -> FastAPI:
         t0 = time.perf_counter()
         chunks = comp().index.add_documents(saved)
 
-        return {"added": [Path(p).name for p in saved],
-                "chunks_added": chunks,
-                "index_s": round(time.perf_counter() - t0, 3)}
+        return {
+            "added": [Path(p).name for p in saved],
+            "chunks_added": chunks,
+            "index_s": round(time.perf_counter() - t0, 3),
+        }
 
     @app.delete("/documents/{filename}")
     def delete_document(filename: str):
@@ -538,8 +582,12 @@ def create_app(components: Components | None = None) -> FastAPI:
             os.remove(path)
 
         if not transcript.strip():
-            return {"transcript": "", "answer": "", "sources": [],
-                    "timings": {"stt_s": stt_s, "total_s": stt_s}}
+            return {
+                "transcript": "",
+                "answer": "",
+                "sources": [],
+                "timings": {"stt_s": stt_s, "total_s": stt_s},
+            }
 
         body, timings = answer_with_timings(c, transcript)
         timings = {"stt_s": stt_s, **timings}
@@ -554,8 +602,9 @@ def create_app(components: Components | None = None) -> FastAPI:
         return body
 
     @app.post("/vision/ask")
-    def vision_ask(image: UploadFile = File(...), question: str = Form(""),
-                   speak: bool = False):
+    def vision_ask(
+        image: UploadFile = File(...), question: str = Form(""), speak: bool = False
+    ):
         c = comp()
         if c.assistant.vision is None:
             raise HTTPException(503, "Vision not available (moondream not loaded)")
@@ -626,9 +675,11 @@ def create_app(components: Components | None = None) -> FastAPI:
     def wake_status():
         listener = app.state.wake_listener
 
-        return {"running": listener.running if listener else False,
-                "state": listener.state if listener else "idle",
-                "score": listener.last_score if listener else None}
+        return {
+            "running": listener.running if listener else False,
+            "state": listener.state if listener else "idle",
+            "score": listener.last_score if listener else None,
+        }
 
     @app.get("/voice/wake/result")
     def wake_result():
