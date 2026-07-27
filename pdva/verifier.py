@@ -129,7 +129,7 @@ _ORDINAL_ALIASES = {
 
 def _key(word: str) -> str:
     k = word.rstrip(".-'").lower()
-    return k[:-2] if k.endswith("'s") else k
+    return k.removesuffix("'s")
 
 def _norm_ordinal(o: str) -> str:
     return _ORDINAL_ALIASES.get(o.lower(), o.lower())
