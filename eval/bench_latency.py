@@ -16,7 +16,7 @@ transcription time tracks the length of the utterance, not the question text.
 Usage:
 
     python bench_latency.py                      # 5 runs/question, TTS included
-    
+
     python bench_latency.py --audio my_question.wav --out docs/latency.md
 """
 
@@ -227,11 +227,12 @@ def timed_turn(rig: Rig, question: str, tts_wav: str) -> dict:
 
     timings["total"] = sum(timings.values())
     return {
-            "timings": timings,
-            "answer": text,
-            "raw_answer": raw_text,
-            "n_sources": len(passages),
-        }
+        "timings": timings,
+        "answer": text,
+        "raw_answer": raw_text,
+        "n_sources": len(passages),
+    }
+
 
 def run_benchmark(rig: Rig, questions: list[str], runs: int, warmup: int) -> dict:
     overall = Samples()
@@ -253,7 +254,9 @@ def run_benchmark(rig: Rig, questions: list[str], runs: int, warmup: int) -> dic
             print(f"\n{question}")
             for _ in range(warmup):
                 cold = timed_turn(rig, question, tts_wav)
-                raw.append({"question": question, "run": "cold", "timings": cold["timings"]})
+                raw.append(
+                    {"question": question, "run": "cold", "timings": cold["timings"]}
+                )
             for i in range(runs):
                 turn = timed_turn(rig, question, tts_wav)
                 t = turn["timings"]
@@ -261,14 +264,16 @@ def run_benchmark(rig: Rig, questions: list[str], runs: int, warmup: int) -> dic
                     samples.add(stage, seconds)
                     overall.add(stage, seconds)
 
-                raw.append({
-                    "question": question,
-                    "run": i,
-                    "timings": t,
-                    "answer_chars": len(turn["answer"]),
-                    "answer": turn["answer"],
-                    "raw_answer": turn["raw_answer"],
-                })
+                raw.append(
+                    {
+                        "question": question,
+                        "run": i,
+                        "timings": t,
+                        "answer_chars": len(turn["answer"]),
+                        "answer": turn["answer"],
+                        "raw_answer": turn["raw_answer"],
+                    }
+                )
 
                 flag = "  OVER BUDGET" if t["total"] > BUDGET_S else ""
                 print(f"  run {i + 1}/{runs}  total {t['total'] * 1000:8.1f} ms{flag}")

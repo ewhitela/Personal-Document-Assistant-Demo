@@ -52,7 +52,7 @@ class RAGPipeline:
         "plainly what it does and does not establish. When the context contains "
         "nothing at all on the question, your entire reply must be this exact "
         "sentence, with no additions or rewording: \"I don't know based on your "
-        "documents.\" Do not explain what the context lacks or describe the "
+        'documents." Do not explain what the context lacks or describe the '
         "passages. If the context answers only part of the question, give that "
         "part and name what is missing in a short clause, not a separate "
         "sentence."

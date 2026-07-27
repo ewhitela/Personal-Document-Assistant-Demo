@@ -127,9 +127,11 @@ _ORDINAL_ALIASES = {
     "7th": "seventh",
 }
 
+
 def _key(word: str) -> str:
     k = word.rstrip(".-'").lower()
     return k.removesuffix("'s")
+
 
 def _norm_ordinal(o: str) -> str:
     return _ORDINAL_ALIASES.get(o.lower(), o.lower())
@@ -270,9 +272,7 @@ def verify(
 
     passage_texts = [p.text for p in passages]
     passage_nums = [_extract_numbers(t) for t in passage_texts]
-    passage_words = [
-        {_key(w) for w in _words(t)} for t in passage_texts
-    ]
+    passage_words = [{_key(w) for w in _words(t)} for t in passage_texts]
     passage_initials = [
         {"".join(w[0].upper() for w in seq) for seq in _cap_sequences(t)}
         for t in passage_texts
