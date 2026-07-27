@@ -8,7 +8,10 @@ license = { text = "MIT" }
 
 dependencies = [
     # Week 4: document embedding and retrieval
-    "sentence-transformers>=2.7",
+    "sentence-transformers==2.7.0",
+    "transformers==4.40.0",
+    "torch==2.2.2",
+    "numpy==1.26.4",
     "chromadb>=0.5",
     "pypdf>=4.0",
     # Week 5: local LLM inference (also install the ollama app, then: ollama pull llama3.2:3b)
@@ -65,3 +68,11 @@ ignore = ["BLE001"]
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Depends", "fastapi.Query"]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu118" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu118"
+url = "https://download.pytorch.org/whl/cu118"
+explicit = true

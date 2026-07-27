@@ -9,6 +9,7 @@ first, then:
 from __future__ import annotations
 
 import base64
+import logging
 import os
 import time
 
@@ -16,6 +17,8 @@ import requests
 import streamlit as st
 
 API_URL = os.environ.get("PDVA_API_URL", "http://127.0.0.1:8080")
+
+logger = logging.getLogger("pdva.ui")
 
 st.set_page_config(page_title="Personal Document Assistant", page_icon="🗂️")
 st.title("Personal Document Assistant")
@@ -64,6 +67,14 @@ def show_result(body: dict) -> None:
         total = timings.get("total_s", 0.0)
         over = " ⚠️ over 3s budget" if total > 3.0 else ""
         st.caption(" · ".join(parts) + f" · **total {total:.2f}s**{over}")
+
+
+def stop_wake_listener_if_running() -> None:
+    """Best-effort stop; used when navigating away and on script rerun cleanup."""
+    try:
+        api("POST", "/voice/wake/stop")
+    except Exception as e:
+        logger.warning("Could not stop wake listener on view switch: %s", e)
 
 
 with st.sidebar:
@@ -129,11 +140,32 @@ with st.sidebar:
 if not service_up:
     st.stop()
 
-voice_tab, wake_tab, text_tab, image_tab = st.tabs(
-    ["🎤 Voice", "🗣️ Wake word", "⌨️ Text", "🖼️ Image"]
+VIEWS = ["🎤 Voice", "🗣️ Wake word", "⌨️ Text", "🖼️ Image"]
+WAKE_VIEW = "🗣️ Wake word"
+
+if "active_view" not in st.session_state:
+    st.session_state.active_view = VIEWS[0]
+
+selected_view = st.segmented_control(
+    "View", VIEWS, default=st.session_state.active_view, key="view_selector"
 )
 
-with voice_tab:
+if selected_view is None:
+    # segmented_control allows deselection; treat that as "stay put" rather
+    # than losing the previous view entirely.
+    selected_view = st.session_state.active_view
+
+# The one thing this whole restructure exists for: if the previous rerun had
+# the Wake word view active and this rerun doesn't, the listener's background
+# thread (and its GPU-contending onnxruntime session) has no reason to keep
+# running. Stop it here, before rendering whatever view we switched to --
+# not after, so a slow /ask on the new view never overlaps with it.
+if st.session_state.active_view == WAKE_VIEW and selected_view != WAKE_VIEW:
+    stop_wake_listener_if_running()
+
+st.session_state.active_view = selected_view
+
+if selected_view == "🎤 Voice":
     recording = st.audio_input("Record your question")
 
     if recording is not None and st.button("Ask", key="ask_voice", type="primary"):
@@ -147,12 +179,13 @@ with voice_tab:
 
         show_result(body)
 
-with wake_tab:
+elif selected_view == WAKE_VIEW:
     st.caption(
         'Say "jarona", then ask your question. This listens on the '
         "microphone attached to the machine running the service — not "
         "your browser's mic — so it only works when the UI and service "
-        "share a machine, as in this demo setup."
+        "share a machine, as in this demo setup. Switching to another view "
+        "automatically stops listening."
     )
 
     wake = api("GET", "/voice/wake/status").json()
@@ -193,13 +226,14 @@ with wake_tab:
         if result.get("ready"):
             show_result(result)
 
-        # Poll once a second while listening. This reruns the whole script,
-        # so typing in the Text tab will be interrupted during this time —
-        # stop listening before switching to another tab.
+        # Poll once a second while this view is active. Since only the
+        # selected view's code runs at all now (unlike st.tabs, which ran
+        # every tab's body every rerun), this no longer fires while another
+        # view is showing.
         time.sleep(1)
         st.rerun()
 
-with text_tab:
+elif selected_view == "⌨️ Text":
     question = st.text_input("Your question")
 
     if st.button("Ask", key="ask_text", type="primary") and question.strip():
@@ -210,7 +244,7 @@ with text_tab:
 
         show_result(body)
 
-with image_tab:
+elif selected_view == "🖼️ Image":
     img = st.file_uploader(
         "Image", type=["png", "jpg", "jpeg", "webp"], key="vision_img"
     )
