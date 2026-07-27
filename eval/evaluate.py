@@ -153,53 +153,79 @@ GOLD: list[tuple] = [
 ]
 
 
-def evaluate_qa(assistant) -> dict:
-    """Run the GOLD set through the assistant and score it.
+def evaluate_qa(assistant, k: int = 5) -> dict:
+    """Run the GOLD set through the assistant k times each and score it.
+
+    Answers are sampled, not deterministic, so a single run per question cannot
+    distinguish a solid pass from a borderline one that happens to land well.
+    Each question is asked k times and scored as a pass rate.
 
     Behavior:
-        For each (question, expected_source, must_contain) in GOLD:
-            result = assistant.answer_text(question)
-            - retrieval hit: expected_source is None, or expected_source is among
-              [s.source for s in result.sources].
-            - answer ok: must_contain (lowercased) appears in result.answer
-              lowercased. For a None expected_source, "ok" means the assistant
-              refused (your refusal phrase appears).
-        Return a dict of counts, for example
-            {"n": ..., "retrieval_hits": ..., "answer_ok": ...}
-        and print a short summary.
+        For each (question, expected_source, must_contain) in GOLD, ask the
+        question k times:
+        - retrieval hit: expected_source is None, or expected_source is among
+          [s.source for s in result.sources].
+        - answer ok: must_contain (lowercased) appears in result.answer
+          lowercased. For a None expected_source, "ok" means the assistant
+          refused (the refusal phrase appears).
+
+    A question counts toward retrieval_hits / answer_ok only if it passed on
+    every one of the k runs. Anything in between is reported as flaky.
     """
     n = len(GOLD)
     retrieval_hits = 0
     answer_ok = 0
     rows = []
+    flaky = []
 
     for question, expected_source, must_contain in GOLD:
-        result = assistant.answer_text(question)
-        answer_lower = result.answer.lower()
-        sources = [s.source for s in result.sources]
+        r_hits = 0
+        a_hits = 0
 
-        if expected_source is None:
-            retrieval_hit = True  # no source expected; nothing to check
-        else:
-            retrieval_hit = expected_source in sources
+        for _ in range(k):
+            result = assistant.answer_text(question)
 
-        hit_ok = must_contain.lower() in answer_lower
+            if expected_source is None:
+                r_hits += 1  # no source expected; nothing to check
+            elif expected_source in [s.source for s in result.sources]:
+                r_hits += 1
 
-        retrieval_hits += int(retrieval_hit)
-        answer_ok += int(hit_ok)
+            if must_contain.lower() in result.answer.lower():
+                a_hits += 1
 
-        rows.append((question, retrieval_hit, hit_ok))
+        retrieval_hits += int(r_hits == k)
+        answer_ok += int(a_hits == k)
+        rows.append((question, r_hits, a_hits))
 
-    print(f"\n{'question':<70} {'retrieval':<10} {'answer'}")
-    for question, retrieval_hit, hit_ok in rows:
+        if 0 < a_hits < k:
+            flaky.append((question, a_hits))
+
+    print(f"\n{'question':<70} {'retrieval':<11} {'answer'}")
+    for question, r_hits, a_hits in rows:
         q_display = (question[:67] + "...") if len(question) > 70 else question
-        print(
-            f"{q_display:<70} {'OK' if retrieval_hit else 'MISS':<10} "
-            f"{'OK' if hit_ok else 'MISS'}"
-        )
+        print(f"{q_display:<70} {f'{r_hits}/{k}':<11} {a_hits}/{k}")
 
-    summary = {"n": n, "retrieval_hits": retrieval_hits, "answer_ok": answer_ok}
-    print(f"\nRetrieval: {retrieval_hits}/{n}   Answer quality: {answer_ok}/{n}")
+    summary = {
+        "n": n,
+        "k": k,
+        "retrieval_hits": retrieval_hits,
+        "answer_ok": answer_ok,
+        "answer_rate": sum(a for _q, _r, a in rows) / (n * k),
+        "flaky": [q for q, _a in flaky],
+    }
+
+    print(
+        f"\nPassed all {k} runs -- retrieval: {retrieval_hits}/{n}   "
+        f"answer quality: {answer_ok}/{n}"
+    )
+    print(f"Mean answer pass rate: {summary['answer_rate']:.0%}")
+
+    if flaky:
+        print(f"\nFlaky ({len(flaky)}): passed some runs but not all")
+        for question, a_hits in flaky:
+            q_display = (question[:67] + "...") if len(question) > 70 else question
+            print(f"  {a_hits}/{k}  {q_display}")
+
     return summary
 
 

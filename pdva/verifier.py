@@ -127,6 +127,9 @@ _ORDINAL_ALIASES = {
     "7th": "seventh",
 }
 
+def _key(word: str) -> str:
+    k = word.rstrip(".-'").lower()
+    return k[:-2] if k.endswith("'s") else k
 
 def _norm_ordinal(o: str) -> str:
     return _ORDINAL_ALIASES.get(o.lower(), o.lower())
@@ -221,7 +224,7 @@ def _anchors_present(
 ) -> bool:
     """All anchors must be supported by this one passage."""
     for a in anchors:
-        key = a.rstrip(".-'").lower()
+        key = _key(a)
         if key in words_set:
             continue
         if a.isupper() and a in initials_set:
@@ -235,7 +238,7 @@ def _ungrounded_entities(
 ) -> list[str]:
     bad = []
     for w in _entity_anchors(sentence):
-        key = w.rstrip(".-'").lower()
+        key = _key(w)
         if key in grounding_lower_words:
             continue
         if w.isupper() and w in corpus_initials:
@@ -268,7 +271,7 @@ def verify(
     passage_texts = [p.text for p in passages]
     passage_nums = [_extract_numbers(t) for t in passage_texts]
     passage_words = [
-        {w.rstrip(".-'").lower() for w in _words(t)} for t in passage_texts
+        {_key(w) for w in _words(t)} for t in passage_texts
     ]
     passage_initials = [
         {"".join(w[0].upper() for w in seq) for seq in _cap_sequences(t)}
@@ -277,7 +280,7 @@ def verify(
 
     context = " ".join(passage_texts)
     grounding = context + " " + question
-    grounding_words = {w.rstrip(".-'").lower() for w in _words(grounding)}
+    grounding_words = {_key(w) for w in _words(grounding)}
     corpus_initials = {
         "".join(w[0].upper() for w in seq) for seq in _cap_sequences(grounding)
     }
