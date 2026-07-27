@@ -32,6 +32,7 @@ dependencies = [
 # Wake-word voice loop (demo_voice.py); CPU-only onnxruntime path
 voice = [
     "openwakeword>=0.6",
+    "onnxruntime==1.20.0",      # >=1.21 silently breaks openwakeword 0.6.x classifiers (no exception, just degenerate output)
     "webrtcvad-wheels>=2.0",    # not `webrtcvad`: no py3.11 prebuilt wheels
 ]
 dev = [

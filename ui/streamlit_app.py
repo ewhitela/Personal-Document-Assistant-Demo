@@ -159,6 +159,8 @@ with wake_tab:
 
     col1, col2 = st.columns([1, 3])
 
+    score_suffix = f" · score {wake['score']:.2f}" if wake.get("score") is not None else ""
+
     if not wake["running"]:
         if col1.button("Start listening", type="primary", key="wake_start"):
             api("POST", "/voice/wake/start", params={"speak": str(speak_answers).lower()})
@@ -168,7 +170,7 @@ with wake_tab:
         if col1.button("Stop listening", key="wake_stop"):
             api("POST", "/voice/wake/stop")
             st.rerun()
-        col2.caption(state_labels.get(wake["state"], f"⚠️ {wake['state']}"))
+        col2.caption(state_labels.get(wake["state"], f"⚠️ {wake['state']}") + score_suffix)
 
     if wake["running"]:
         result = api("GET", "/voice/wake/result").json()

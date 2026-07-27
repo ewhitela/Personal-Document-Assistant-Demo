@@ -147,5 +147,6 @@ class LocalLLM:
             messages=messages,
             options={"temperature": self.temperature, "num_predict": 220},
             stream=True,
+            keep_alive=-1,
         ):
             yield chunk.message.content

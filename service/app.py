@@ -50,8 +50,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel
 
 from pdva.assistant import Assistant
-from pdva.verifier import VerifiedRAGPipeline
-from pdva.verifier import verify
+from pdva.verifier import VerifiedRAGPipeline, verify
 
 logger = logging.getLogger("pdva.service")
 
@@ -82,7 +81,14 @@ class Components:
 
 def build_components() -> Components:
     """Load every model once. Import pdva lazily so this module stays cheap."""
-    from pdva import DocumentIndex, LocalLLM, RAGPipeline, Speaker, Transcriber, VisionModel
+    from pdva import (
+        DocumentIndex,
+        LocalLLM,
+        RAGPipeline,
+        Speaker,
+        Transcriber,
+        VisionModel,
+    )
 
     index = DocumentIndex()
     llm = LocalLLM()
@@ -222,7 +228,8 @@ class WakeListener:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self.state = "idle"  # idle | listening | recording | answering | error: <msg>
-        self.results: "pyqueue.Queue[dict]" = pyqueue.Queue()
+        self.last_score = 0.0  # most recent wake-word confidence, for live debugging
+        self.results: pyqueue.Queue[dict] = pyqueue.Queue()
 
     @property
     def running(self) -> bool:
@@ -263,6 +270,7 @@ class WakeListener:
             import sounddevice as sd
             import webrtcvad
             from openwakeword.model import Model as WakeWordModel
+
             from pdva import config
         except Exception as e:
             # ImportError if a package isn't installed; sounddevice also
@@ -272,13 +280,13 @@ class WakeListener:
             return
 
         try:
-            oww = WakeWordModel(wakeword_model_paths=[config.OPENWAKEWORD_MODEL])
+            oww = WakeWordModel(wakeword_models=[config.OPENWAKEWORD_MODEL])
         except Exception as e:
             self.state = f"error: could not load wake-word model ({e})"
             return
 
         vad = webrtcvad.Vad(WAKE_VAD_AGGRESSIVENESS)
-        q: "pyqueue.Queue" = pyqueue.Queue()
+        q: pyqueue.Queue = pyqueue.Queue()
 
         def callback(indata, frames, time_info, status):
             if status:
@@ -299,12 +307,24 @@ class WakeListener:
             with stream:
                 self.state = "listening"
 
+                frame_count = 0
+
                 while not self._stop.is_set():
                     frame, leftover = self._read_frame(q, WAKE_OWW_FRAME_SAMPLES, leftover)
                     if frame is None:
                         break
 
                     score = max(oww.predict(frame).values())
+                    self.last_score = round(float(score), 3)
+                    frame_count += 1
+
+                    # ~1x/second (frames are 80ms each): confirms in the
+                    # server console whether audio is reaching the model at
+                    # all, without needing the Streamlit UI open.
+                    if frame_count % 12 == 0:
+                        logger.info("wake listener score=%.3f (threshold=%.2f)",
+                                     self.last_score, WAKE_THRESHOLD)
+
                     if score < WAKE_THRESHOLD:
                         continue
 
@@ -607,7 +627,8 @@ def create_app(components: Components | None = None) -> FastAPI:
         listener = app.state.wake_listener
 
         return {"running": listener.running if listener else False,
-                "state": listener.state if listener else "idle"}
+                "state": listener.state if listener else "idle",
+                "score": listener.last_score if listener else None}
 
     @app.get("/voice/wake/result")
     def wake_result():
