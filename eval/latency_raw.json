@@ -1,0 +1,437 @@
+[
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": "cold",
+    "timings": {
+      "stt": 0.45138533000135794,
+      "retrieve": 0.007203179004136473,
+      "generate": 0.39042244097799994,
+      "verify": 0.0029364910151343793,
+      "tts": 0.18782841201755218,
+      "total": 1.039775853016181
+    }
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 0,
+    "timings": {
+      "stt": 0.4997695929778274,
+      "retrieve": 0.006854530976852402,
+      "generate": 0.3926125270081684,
+      "verify": 0.00277019600616768,
+      "tts": 0.2197299420076888,
+      "total": 1.1217367889767047
+    },
+    "answer_chars": 88,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River."
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 1,
+    "timings": {
+      "stt": 0.5023517589725088,
+      "retrieve": 0.006868274009320885,
+      "generate": 0.36322205897886306,
+      "verify": 0.0028737480170093477,
+      "tts": 0.17257446801522747,
+      "total": 1.0478903079929296
+    },
+    "answer_chars": 88,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River."
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 2,
+    "timings": {
+      "stt": 0.5002384829858784,
+      "retrieve": 0.008116477023577318,
+      "generate": 0.36112843398586847,
+      "verify": 0.0030925660103093833,
+      "tts": 0.16681480698753148,
+      "total": 1.039390766993165
+    },
+    "answer_chars": 88,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River."
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 3,
+    "timings": {
+      "stt": 0.47113050299230963,
+      "retrieve": 0.008112515992252156,
+      "generate": 0.389485360996332,
+      "verify": 0.002862649009330198,
+      "tts": 0.1710141230141744,
+      "total": 1.0426051520043984
+    },
+    "answer_chars": 95,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh, and they form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh, and they form the Ohio River."
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 4,
+    "timings": {
+      "stt": 0.45876343702548184,
+      "retrieve": 0.008002493996173143,
+      "generate": 0.38107687499723397,
+      "verify": 0.002847494004527107,
+      "tts": 0.23884666597587056,
+      "total": 1.0895369659992866
+    },
+    "answer_chars": 95,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh, and they form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh, and they form the Ohio River."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": "cold",
+    "timings": {
+      "stt": 0.47374428299372084,
+      "retrieve": 0.007228904985822737,
+      "generate": 1.9864224150078371,
+      "verify": 0.0022639380185864866,
+      "tts": 0.6750181029783562,
+      "total": 3.1446776439843234
+    }
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 0,
+    "timings": {
+      "stt": 0.46269470697734505,
+      "retrieve": 0.007007295003859326,
+      "generate": 0.46187281201127917,
+      "verify": 0.002573992998804897,
+      "tts": 0.3711495540046599,
+      "total": 1.3052983609959483
+    },
+    "answer_chars": 148,
+    "answer": "Steel. The steel industry represented in the 1970s accounted for a higher share of the region's total employment than the medical sector does today.",
+    "raw_answer": "Steel. The steel industry represented in the 1970s accounted for a higher share of the region's total employment than the medical sector does today."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 1,
+    "timings": {
+      "stt": 0.47401225101202726,
+      "retrieve": 0.0069905710115563124,
+      "generate": 0.7077292870089877,
+      "verify": 0.002287987997988239,
+      "tts": 0.5144929160014726,
+      "total": 1.7055130130320322
+    },
+    "answer_chars": 242,
+    "answer": "Steel. The steel industry was a major driver of Pittsburgh's growth in the 20th century, but it declined significantly in the early 1980s and later shifted to education, tourism, and services, with healthcare/medicine becoming a major sector.",
+    "raw_answer": "Steel. The steel industry was a major driver of Pittsburgh's growth in the 20th century, but it declined significantly in the early 1980s and later shifted to education, tourism, and services, with healthcare/medicine becoming a major sector."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 2,
+    "timings": {
+      "stt": 0.4669696380151436,
+      "retrieve": 0.006768190010916442,
+      "generate": 0.7042132259812206,
+      "verify": 0.002266046009026468,
+      "tts": 0.515663592988858,
+      "total": 1.695880693005165
+    },
+    "answer_chars": 245,
+    "answer": "Steel. The steel industry was a major driver of Pittsburgh's growth in the 20th century, but it declined significantly in the early 1980s and later shifted to education, tourism, and services, with healthcare/medicine being a significant sector.",
+    "raw_answer": "Steel. The steel industry was a major driver of Pittsburgh's growth in the 20th century, but it declined significantly in the early 1980s and later shifted to education, tourism, and services, with healthcare/medicine being a significant sector."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 3,
+    "timings": {
+      "stt": 0.5024133129918482,
+      "retrieve": 0.007987542019691318,
+      "generate": 0.7091321259795222,
+      "verify": 0.0023225030163303018,
+      "tts": 0.5335292959935032,
+      "total": 1.7553847800008953
+    },
+    "answer_chars": 245,
+    "answer": "Steel. The steel industry was a major driver of Pittsburgh's growth in the 20th century, but it declined significantly in the early 1980s and later shifted to education, tourism, and services, with healthcare/medicine being a significant sector.",
+    "raw_answer": "Steel. The steel industry was a major driver of Pittsburgh's growth in the 20th century, but it declined significantly in the early 1980s and later shifted to education, tourism, and services, with healthcare/medicine being a significant sector."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 4,
+    "timings": {
+      "stt": 0.46088346900069155,
+      "retrieve": 0.008036007027840242,
+      "generate": 0.7119777709885966,
+      "verify": 0.0023272749967873096,
+      "tts": 0.5050363690243103,
+      "total": 1.688260891038226
+    },
+    "answer_chars": 245,
+    "answer": "Steel. The steel industry was a major driver of Pittsburgh's growth in the 20th century, but it declined significantly in the early 1980s and later shifted to education, tourism, and services, with healthcare/medicine being a significant sector.",
+    "raw_answer": "Steel. The steel industry was a major driver of Pittsburgh's growth in the 20th century, but it declined significantly in the early 1980s and later shifted to education, tourism, and services, with healthcare/medicine being a significant sector."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": "cold",
+    "timings": {
+      "stt": 0.4627187219739426,
+      "retrieve": 0.010878845991101116,
+      "generate": 1.924345164996339,
+      "verify": 0.002415969007415697,
+      "tts": 0.5803974949812982,
+      "total": 2.9807561969500966
+    }
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 0,
+    "timings": {
+      "stt": 0.47499804699327797,
+      "retrieve": 0.008386572008021176,
+      "generate": 0.7514293790154625,
+      "verify": 0.002413050999166444,
+      "tts": 0.5785268269828521,
+      "total": 1.8157538759987801
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 1,
+    "timings": {
+      "stt": 0.49197430702042766,
+      "retrieve": 0.008400945022003725,
+      "generate": 0.7507087669800967,
+      "verify": 0.0024315210175700486,
+      "tts": 0.5700636440014932,
+      "total": 1.8235791840415914
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 2,
+    "timings": {
+      "stt": 0.46673612197628245,
+      "retrieve": 0.008305833005579188,
+      "generate": 0.7896705000021029,
+      "verify": 0.0024899470154196024,
+      "tts": 0.5973895560018718,
+      "total": 1.864591958001256
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 3,
+    "timings": {
+      "stt": 0.5047673819935881,
+      "retrieve": 0.008407930989051238,
+      "generate": 0.7399116250162479,
+      "verify": 0.0023262400063686073,
+      "tts": 0.562220399006037,
+      "total": 1.8176335770112928
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 4,
+    "timings": {
+      "stt": 0.49250633097835816,
+      "retrieve": 0.008677117992192507,
+      "generate": 0.7478794660128187,
+      "verify": 0.0023522529809270054,
+      "tts": 0.5597618430037983,
+      "total": 1.8111770109680947
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": "cold",
+    "timings": {
+      "stt": 0.49436898197745904,
+      "retrieve": 0.008527539001079276,
+      "generate": 1.4953578989952803,
+      "verify": 0.0026988100144080818,
+      "tts": 0.1900221660034731,
+      "total": 2.1909753959916998
+    }
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 0,
+    "timings": {
+      "stt": 0.46149837799021043,
+      "retrieve": 0.0071845779893919826,
+      "generate": 0.3407739410176873,
+      "verify": 0.002466400997946039,
+      "tts": 0.25338301100418903,
+      "total": 1.0653063089994248
+    },
+    "answer_chars": 69,
+    "answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 1,
+    "timings": {
+      "stt": 0.4511032000009436,
+      "retrieve": 0.007364412012975663,
+      "generate": 0.3392435419955291,
+      "verify": 0.002504425006918609,
+      "tts": 0.1841102649923414,
+      "total": 0.9843258440087084
+    },
+    "answer_chars": 69,
+    "answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 2,
+    "timings": {
+      "stt": 0.45104119399911724,
+      "retrieve": 0.007385424978565425,
+      "generate": 0.33606691600289196,
+      "verify": 0.0025152510206680745,
+      "tts": 0.18240675897686742,
+      "total": 0.9794155449781101
+    },
+    "answer_chars": 69,
+    "answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 3,
+    "timings": {
+      "stt": 0.4516041030001361,
+      "retrieve": 0.008066084992606193,
+      "generate": 0.33799899800214916,
+      "verify": 0.0024554799892939627,
+      "tts": 0.1836395799764432,
+      "total": 0.9837642459606286
+    },
+    "answer_chars": 69,
+    "answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 4,
+    "timings": {
+      "stt": 0.4554527720029,
+      "retrieve": 0.008372444019187242,
+      "generate": 0.33993228198960423,
+      "verify": 0.0025014079874381423,
+      "tts": 0.26548117998754606,
+      "total": 1.0717400859866757
+    },
+    "answer_chars": 69,
+    "answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had 6 boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": "cold",
+    "timings": {
+      "stt": 0.47423850299674086,
+      "retrieve": 0.007174625003244728,
+      "generate": 1.4402872580103576,
+      "verify": 0.002402899001026526,
+      "tts": 0.05793322098907083,
+      "total": 1.9820365060004406
+    }
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 0,
+    "timings": {
+      "stt": 0.4607381300011184,
+      "retrieve": 0.007115247019100934,
+      "generate": 0.17177769998670556,
+      "verify": 0.002432270994177088,
+      "tts": 0.06127295101759955,
+      "total": 0.7033362990187015
+    },
+    "answer_chars": 14,
+    "answer": "8 centimeters.",
+    "raw_answer": "8 centimeters."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 1,
+    "timings": {
+      "stt": 0.45459408601163886,
+      "retrieve": 0.008146146981744096,
+      "generate": 0.17308939501526766,
+      "verify": 0.0024230889976024628,
+      "tts": 0.05456721398513764,
+      "total": 0.6928199309913907
+    },
+    "answer_chars": 14,
+    "answer": "8 centimeters.",
+    "raw_answer": "8 centimeters."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 2,
+    "timings": {
+      "stt": 0.4714917959936429,
+      "retrieve": 0.007137961016269401,
+      "generate": 0.1644966019957792,
+      "verify": 0.002438208000967279,
+      "tts": 0.05594139499589801,
+      "total": 0.7015059620025568
+    },
+    "answer_chars": 14,
+    "answer": "8 centimeters.",
+    "raw_answer": "8 centimeters."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 3,
+    "timings": {
+      "stt": 0.4731856849975884,
+      "retrieve": 0.0072186869801953435,
+      "generate": 0.17900200601434335,
+      "verify": 0.0024502319865860045,
+      "tts": 0.0574317489808891,
+      "total": 0.7192883589596022
+    },
+    "answer_chars": 14,
+    "answer": "8 centimeters.",
+    "raw_answer": "8 centimeters."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 4,
+    "timings": {
+      "stt": 0.4730616220040247,
+      "retrieve": 0.008239777002017945,
+      "generate": 0.18416247301502153,
+      "verify": 0.002461644005961716,
+      "tts": 0.06287329300539568,
+      "total": 0.7307988090324216
+    },
+    "answer_chars": 14,
+    "answer": "8 centimeters.",
+    "raw_answer": "8 centimeters."
+  }
+]

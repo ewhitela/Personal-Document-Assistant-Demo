@@ -44,11 +44,16 @@ dev = [
 ]
 
 [tool.uv]
-# Keep resolution deterministic per platform; uv.lock is committed.
-# CUDA note: torch arrives transitively via sentence-transformers. On the
-# workstation the default PyPI wheels (CUDA-bundled on Linux) are fine; on
-# macOS uv resolves CPU/MPS wheels automatically. No CUDA index pinning is
-# required because STT/TTS run on CPU and the LLM lives in ollama.
+# uv.lock is committed and is the single source of truth for both machines.
+# It resolves all platforms from one `uv lock` run, so regenerate it on the
+# workstation only.
+#
+# CUDA note: torch is pinned to 2.2.2 from the cu118 index on Linux (see
+# [tool.uv.sources]). This is deliberate — the 1080 Ti is Pascal (SM 6.1) and
+# needs the cuDNN 8 build; newer CUDA wheels drop compute capability < 7.5.
+# STT and TTS run on CPU and the LLM lives in ollama, so nothing in this venv
+# actually touches the GPU; the pin exists to stop an unrelated upgrade from
+# dragging in a cuDNN 9 stack that breaks onnxruntime and faster-whisper.
 
 [build-system]
 requires = ["hatchling"]
@@ -56,6 +61,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "ipykernel>=7.3.0",
     "pytest>=9.1.1",
     "ruff>=0.16.0",
 ]
@@ -70,7 +76,12 @@ ignore = ["BLE001"]
 extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Depends", "fastapi.Query"]
 
 [tool.uv.sources]
-torch = [{ index = "pytorch-cu118" }]
+# Linux only. The cu118 index publishes no macOS wheels, so an unconditional
+# source here makes `uv sync` unresolvable on the MacBook. On macOS uv falls
+# back to PyPI, which serves CPU/MPS wheels for torch 2.2.2.
+torch = [
+    { index = "pytorch-cu118", marker = "sys_platform == 'linux'" },
+]
 
 [[tool.uv.index]]
 name = "pytorch-cu118"
