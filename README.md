@@ -64,9 +64,6 @@ support for compute capability < 7.5.
 
 Requires Python 3.11 and [uv](https://docs.astral.sh/uv/). 
 
-Activate virtual environment by running:
-    source .venv/bin/activate
-
 Dependencies are locked in `uv.lock`, which resolves both Linux and macOS from one file — the
 same command works on the workstation and the laptop:
 
@@ -81,6 +78,9 @@ Mac-generated lock will silently drop the CUDA-side pins.
 On Linux, torch comes from the cu118 index because the 1080 Ti is Pascal
 (SM 6.1) and needs the cuDNN 8 build. On macOS that pin does not apply and uv
 takes CPU/MPS wheels from PyPI.
+
+Activate virtual environment by running:
+    `source .venv/bin/activate`
 
 Download the wake-word feature-extraction models (not bundled with the
 openWakeWord pip package — required before `demo_voice.py` or any wake-word
