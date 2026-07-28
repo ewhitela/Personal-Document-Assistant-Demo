@@ -25,12 +25,12 @@ support for compute capability < 7.5.
       rag.py                  Week 6: RAGPipeline (grounded answering)
       transcriber.py          Week 7: Transcriber (speech-to-text)
       tts.py                  Week 8: Speaker (text-to-speech)
-      vision.py               Week 9: VisionModel (optional, image questions)
+      vision.py               Week 9: VisionModel (image questions)
       assistant.py            Week 10: Assistant (owns the loaded models, one per process)
       verifier.py             Week 10: VerifiedRAGPipeline (flags ungrounded claims, abstains when context doesn't bear on the question)
-      edge_speaker.py         Week 11 (optional): EdgeSpeaker, same interface as Speaker,
+      edge_speaker.py         Week 11: EdgeSpeaker, same interface as Speaker,
                               backed by an HTTP call to a Jetson-hosted Piper service
-      jetson_tts_service.py   Week 11 (optional): Flask app that runs ON the Jetson
+      jetson_tts_service.py   Week 11: Flask app that runs ON the Jetson
                               (JetPack 4.6 / Python 3.6), not part of the workstation venv —
                               wraps the piper CLI binary, exposes /health and /synthesize
 
@@ -49,7 +49,7 @@ support for compute capability < 7.5.
     eval/
       evaluate.py             Retrieval and answer-quality scoring against the GOLD set
       bench_latency.py        Per-stage latency benchmark (the Week 12 deliverable)
-      edge_latency.py         Week 11 (optional): local vs. Jetson TTS latency comparison
+      edge_latency.py         Week 11: local vs. Jetson TTS latency comparison
 
     docs/
       architecture.svg        System diagram: service process, RAG+verifier pipeline,
