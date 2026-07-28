@@ -82,6 +82,7 @@ On Linux, torch comes from the cu118 index because the 1080 Ti is Pascal
 takes CPU/MPS wheels from PyPI.
 
 Activate virtual environment by running:
+    
     source .venv/bin/activate
 
 Download the wake-word feature-extraction models (not bundled with the
