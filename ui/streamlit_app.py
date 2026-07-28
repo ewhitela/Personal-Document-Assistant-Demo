@@ -240,7 +240,7 @@ elif selected_view == WAKE_VIEW:
         # already fetched this pass if one was ready.
         time.sleep(1)
         st.rerun()
-        
+
 elif selected_view == "⌨️ Text":
     question = st.text_input("Your question")
 
