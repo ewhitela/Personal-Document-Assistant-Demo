@@ -1,0 +1,764 @@
+[
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": "cold",
+    "timings": {
+      "stt": 0.5702638830116484,
+      "retrieve": 0.5411451089894399,
+      "generate": 1.4028997890127357,
+      "verify": 0.003157525003189221,
+      "tts": 0.22808438699576072,
+      "total": 2.745550693012774
+    }
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 0,
+    "timings": {
+      "stt": 0.5102617160009686,
+      "retrieve": 0.007217216014396399,
+      "generate": 0.36359905198332854,
+      "verify": 0.0022965510142967105,
+      "tts": 0.21123470400925726,
+      "total": 1.0946092390222475
+    },
+    "answer_chars": 88,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River."
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 1,
+    "timings": {
+      "stt": 0.494627521984512,
+      "retrieve": 0.007170045981183648,
+      "generate": 0.3594617580238264,
+      "verify": 0.0023362749780062586,
+      "tts": 0.159411172993714,
+      "total": 1.0230067739612423
+    },
+    "answer_chars": 88,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River."
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 2,
+    "timings": {
+      "stt": 0.4871803839923814,
+      "retrieve": 0.006977045995881781,
+      "generate": 0.3599755020113662,
+      "verify": 0.0023099649988580495,
+      "tts": 0.22030032498878427,
+      "total": 1.0767432219872717
+    },
+    "answer_chars": 88,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River."
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 3,
+    "timings": {
+      "stt": 0.4913457630027551,
+      "retrieve": 0.00688275700667873,
+      "generate": 0.3612288720032666,
+      "verify": 0.0022666939767077565,
+      "tts": 0.21897536198957823,
+      "total": 1.0806994479789864
+    },
+    "answer_chars": 88,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River."
+  },
+  {
+    "question": "What rivers meet in Pittsburgh, and what do they form?",
+    "run": 4,
+    "timings": {
+      "stt": 0.5334100839972962,
+      "retrieve": 0.006870890996651724,
+      "generate": 0.357631983992178,
+      "verify": 0.0022738469997420907,
+      "tts": 0.22225255897501484,
+      "total": 1.1224393649608828
+    },
+    "answer_chars": 88,
+    "answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River.",
+    "raw_answer": "The Allegheny River and the Monongahela River meet in Pittsburgh to form the Ohio River."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 0,
+    "timings": {
+      "stt": 0.49072985601378605,
+      "retrieve": 0.00689280399819836,
+      "generate": 1.5477082220022567,
+      "verify": 0.0017984979785978794,
+      "tts": 0.3538226370001212,
+      "total": 2.40095201699296
+    },
+    "answer_chars": 125,
+    "answer": "Steel. The city was once a major steel producer, but it shifted to other industries such as medicine, technology, and energy.",
+    "raw_answer": "Steel. The city was once a major steel producer, but it shifted to other industries such as medicine, technology, and energy."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 1,
+    "timings": {
+      "stt": 0.4923093830002472,
+      "retrieve": 0.0068531460128724575,
+      "generate": 0.5656982329965103,
+      "verify": 0.0017539309919811785,
+      "tts": 0.49190582198207267,
+      "total": 1.5585205149836838
+    },
+    "answer_chars": 192,
+    "answer": "Steel. The city was once the nation's eighth-largest city, accounting for between one-third and one-half of national steel output, but it shifted from heavy industry to medicine, tech, energy.",
+    "raw_answer": "Steel. The city was once the nation's eighth-largest city, accounting for between one-third and one-half of national steel output, but it shifted from heavy industry to medicine, tech, energy."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 2,
+    "timings": {
+      "stt": 0.5351428510039113,
+      "retrieve": 0.007852779992390424,
+      "generate": 0.569717620004667,
+      "verify": 0.0018463510205037892,
+      "tts": 0.4874119779851753,
+      "total": 1.6019715800066479
+    },
+    "answer_chars": 192,
+    "answer": "Steel. The city was once the nation's eighth-largest city, accounting for between one-third and one-half of national steel output, but it shifted from heavy industry to medicine, tech, energy.",
+    "raw_answer": "Steel. The city was once the nation's eighth-largest city, accounting for between one-third and one-half of national steel output, but it shifted from heavy industry to medicine, tech, energy."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 3,
+    "timings": {
+      "stt": 0.5020445499976631,
+      "retrieve": 0.007869049004511908,
+      "generate": 0.5653872590046376,
+      "verify": 0.0018863389850594103,
+      "tts": 0.5005007750005461,
+      "total": 1.5776879719924182
+    },
+    "answer_chars": 192,
+    "answer": "Steel. The city was once the nation's eighth-largest city, accounting for between one-third and one-half of national steel output, but it shifted from heavy industry to medicine, tech, energy.",
+    "raw_answer": "Steel. The city was once the nation's eighth-largest city, accounting for between one-third and one-half of national steel output, but it shifted from heavy industry to medicine, tech, energy."
+  },
+  {
+    "question": "What was Pittsburgh's historical industry, and how has that changed?",
+    "run": 4,
+    "timings": {
+      "stt": 0.5380543790233787,
+      "retrieve": 0.00784737800131552,
+      "generate": 0.5635311679798178,
+      "verify": 0.0018817180243786424,
+      "tts": 0.5158042460097931,
+      "total": 1.6271188890386838
+    },
+    "answer_chars": 192,
+    "answer": "Steel. The city was once the nation's eighth-largest city, accounting for between one-third and one-half of national steel output, but it shifted from heavy industry to medicine, tech, energy.",
+    "raw_answer": "Steel. The city was once the nation's eighth-largest city, accounting for between one-third and one-half of national steel output, but it shifted from heavy industry to medicine, tech, energy."
+  },
+  {
+    "question": "What's Pittsburgh's population according to the most recent census mentioned in the article?",
+    "run": 0,
+    "timings": {
+      "stt": 0.5362235969805624,
+      "retrieve": 0.009450750978430733,
+      "generate": 1.3077320480078924,
+      "verify": 0.0021458120027091354,
+      "tts": 0.11918155901366845,
+      "total": 1.9747337669832632
+    },
+    "answer_chars": 8,
+    "answer": "302,971.",
+    "raw_answer": "302,971."
+  },
+  {
+    "question": "What's Pittsburgh's population according to the most recent census mentioned in the article?",
+    "run": 1,
+    "timings": {
+      "stt": 0.5067293549946044,
+      "retrieve": 0.00817513299989514,
+      "generate": 0.17454663501121104,
+      "verify": 0.0020536780066322535,
+      "tts": 0.12877332701464184,
+      "total": 0.8202781280269846
+    },
+    "answer_chars": 8,
+    "answer": "302,971.",
+    "raw_answer": "302,971."
+  },
+  {
+    "question": "What's Pittsburgh's population according to the most recent census mentioned in the article?",
+    "run": 2,
+    "timings": {
+      "stt": 0.493072220007889,
+      "retrieve": 0.00699045998044312,
+      "generate": 0.17156842901022173,
+      "verify": 0.002031957992585376,
+      "tts": 0.12409959899378009,
+      "total": 0.7977626659849193
+    },
+    "answer_chars": 8,
+    "answer": "302,971.",
+    "raw_answer": "302,971."
+  },
+  {
+    "question": "What's Pittsburgh's population according to the most recent census mentioned in the article?",
+    "run": 3,
+    "timings": {
+      "stt": 0.5275727169937454,
+      "retrieve": 0.008204801008105278,
+      "generate": 0.16373740500421263,
+      "verify": 0.002044585009571165,
+      "tts": 0.12658785498933867,
+      "total": 0.8281473630049732
+    },
+    "answer_chars": 8,
+    "answer": "302,971.",
+    "raw_answer": "302,971."
+  },
+  {
+    "question": "What's Pittsburgh's population according to the most recent census mentioned in the article?",
+    "run": 4,
+    "timings": {
+      "stt": 0.5214980929740705,
+      "retrieve": 0.008238304988481104,
+      "generate": 0.17140678298892453,
+      "verify": 0.002127651998307556,
+      "tts": 0.12300622201291844,
+      "total": 0.8262770549627021
+    },
+    "answer_chars": 8,
+    "answer": "302,971.",
+    "raw_answer": "302,971."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 0,
+    "timings": {
+      "stt": 0.4965510829933919,
+      "retrieve": 0.008231056010117754,
+      "generate": 1.733323409978766,
+      "verify": 0.0019228550081606954,
+      "tts": 0.7627757409936748,
+      "total": 3.002804144984111
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 1,
+    "timings": {
+      "stt": 0.49497686797985807,
+      "retrieve": 0.008318791980855167,
+      "generate": 0.7325489780050702,
+      "verify": 0.0019113640009891242,
+      "tts": 0.7443871730065439,
+      "total": 1.9821431749733165
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 2,
+    "timings": {
+      "stt": 0.5060666249773931,
+      "retrieve": 0.00732087399228476,
+      "generate": 0.7332826810015831,
+      "verify": 0.0019017950107809156,
+      "tts": 0.7434493119944818,
+      "total": 1.9920212869765237
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 3,
+    "timings": {
+      "stt": 0.49361266000778414,
+      "retrieve": 0.006999552017077804,
+      "generate": 0.7349182189791463,
+      "verify": 0.00191019699559547,
+      "tts": 0.725522638997063,
+      "total": 1.9629632669966668
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "What's the elevation of Flagstaff, and why does that matter for the city's climate?",
+    "run": 4,
+    "timings": {
+      "stt": 0.5365663770062383,
+      "retrieve": 0.006961483013583347,
+      "generate": 0.7354080560035072,
+      "verify": 0.0018648009863682091,
+      "tts": 0.5776083079981618,
+      "total": 1.8584090250078589
+    },
+    "answer_chars": 216,
+    "answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona.",
+    "raw_answer": "7,000 feet (2,130 m). The elevation matters because it contributes to the city's cool winter temperatures averaging 45 \u00b0F (7 \u00b0C) and warm summer temperatures averaging 80 \u00b0F (27 \u00b0C), much cooler than much of Arizona."
+  },
+  {
+    "question": "Did Flagstaff launch a bid to host the 1960 Winter Olympics?",
+    "run": 0,
+    "timings": {
+      "stt": 0.5098589659901336,
+      "retrieve": 0.007128721015760675,
+      "generate": 1.3133579739951529,
+      "verify": 0.0018945469928439707,
+      "tts": 0.1836476550088264,
+      "total": 2.0158878630027175
+    },
+    "answer_chars": 84,
+    "answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics.",
+    "raw_answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics."
+  },
+  {
+    "question": "Did Flagstaff launch a bid to host the 1960 Winter Olympics?",
+    "run": 1,
+    "timings": {
+      "stt": 0.4839007370173931,
+      "retrieve": 0.007013516005827114,
+      "generate": 0.38183770299656317,
+      "verify": 0.001864524994743988,
+      "tts": 0.1774810029892251,
+      "total": 1.0520974840037525
+    },
+    "answer_chars": 84,
+    "answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics.",
+    "raw_answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics."
+  },
+  {
+    "question": "Did Flagstaff launch a bid to host the 1960 Winter Olympics?",
+    "run": 2,
+    "timings": {
+      "stt": 0.5264967320254073,
+      "retrieve": 0.0068970510037615895,
+      "generate": 0.3803967249987181,
+      "verify": 0.001815805007936433,
+      "tts": 0.18393008800921962,
+      "total": 1.099536401045043
+    },
+    "answer_chars": 84,
+    "answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics.",
+    "raw_answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics."
+  },
+  {
+    "question": "Did Flagstaff launch a bid to host the 1960 Winter Olympics?",
+    "run": 3,
+    "timings": {
+      "stt": 0.4834047299809754,
+      "retrieve": 0.006927112000994384,
+      "generate": 0.37299224600428715,
+      "verify": 0.0017996909737121314,
+      "tts": 0.24529510701540858,
+      "total": 1.1104188859753776
+    },
+    "answer_chars": 84,
+    "answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics.",
+    "raw_answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics."
+  },
+  {
+    "question": "Did Flagstaff launch a bid to host the 1960 Winter Olympics?",
+    "run": 4,
+    "timings": {
+      "stt": 0.48943187500117347,
+      "retrieve": 0.006938632985111326,
+      "generate": 0.3737730230204761,
+      "verify": 0.0018265929829794914,
+      "tts": 0.2425451219896786,
+      "total": 1.114515245979419
+    },
+    "answer_chars": 84,
+    "answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics.",
+    "raw_answer": "Yes. The city tried to launch a bid to be the host city of the 1960 Winter Olympics."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 0,
+    "timings": {
+      "stt": 0.4938999430160038,
+      "retrieve": 0.007195323996711522,
+      "generate": 1.3098280550038908,
+      "verify": 0.00209208601154387,
+      "tts": 0.2670519379898906,
+      "total": 2.0800673460180406
+    },
+    "answer_chars": 71,
+    "answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 1,
+    "timings": {
+      "stt": 0.5161271079850849,
+      "retrieve": 0.007157921994803473,
+      "generate": 0.3314628780062776,
+      "verify": 0.002106252999510616,
+      "tts": 0.25872736200108193,
+      "total": 1.1155815229867585
+    },
+    "answer_chars": 71,
+    "answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 2,
+    "timings": {
+      "stt": 0.4897670299978927,
+      "retrieve": 0.007177862018579617,
+      "generate": 0.3282157490029931,
+      "verify": 0.0019357109849806875,
+      "tts": 0.2508748020045459,
+      "total": 1.077971154008992
+    },
+    "answer_chars": 71,
+    "answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 3,
+    "timings": {
+      "stt": 0.533331590006128,
+      "retrieve": 0.008251830993685871,
+      "generate": 0.322519798995927,
+      "verify": 0.0019547440169844776,
+      "tts": 0.2652778860065155,
+      "total": 1.1313358500192408
+    },
+    "answer_chars": 71,
+    "answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "How many boilers did Itsukushima have, and what was her average maximum speed?",
+    "run": 4,
+    "timings": {
+      "stt": 0.4917484670004342,
+      "retrieve": 0.008324174006702378,
+      "generate": 0.32386048400076106,
+      "verify": 0.0019386579806450754,
+      "tts": 0.2502978979900945,
+      "total": 1.0761696809786372
+    },
+    "answer_chars": 71,
+    "answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots.",
+    "raw_answer": "Itsukushima had six boilers. Her average maximum speed was 16.78 knots."
+  },
+  {
+    "question": "Did Itsukushima survive World War II?",
+    "run": 0,
+    "timings": {
+      "stt": 0.50421135299257,
+      "retrieve": 0.006817613990278915,
+      "generate": 1.3375337560137268,
+      "verify": 0.001949308003531769,
+      "tts": 0.24481348201516084,
+      "total": 2.0953255130152684
+    },
+    "answer_chars": 68,
+    "answer": "No, Itsukushima was scrapped on 12 March 1926 at Kure Naval Arsenal.",
+    "raw_answer": "No, Itsukushima was scrapped on 12 March 1926 at Kure Naval Arsenal."
+  },
+  {
+    "question": "Did Itsukushima survive World War II?",
+    "run": 1,
+    "timings": {
+      "stt": 0.4953627670183778,
+      "retrieve": 0.006871835998026654,
+      "generate": 0.3252735029964242,
+      "verify": 0.0020099020039197057,
+      "tts": 0.23173731000861153,
+      "total": 1.0612553180253599
+    },
+    "answer_chars": 59,
+    "answer": "No, It was scrapped on 12 March 1926 at Kure Naval Arsenal.",
+    "raw_answer": "No, It was scrapped on 12 March 1926 at Kure Naval Arsenal."
+  },
+  {
+    "question": "Did Itsukushima survive World War II?",
+    "run": 2,
+    "timings": {
+      "stt": 0.4932239520130679,
+      "retrieve": 0.006957300996873528,
+      "generate": 0.32481965600163676,
+      "verify": 0.0019976460025645792,
+      "tts": 0.2235603379958775,
+      "total": 1.0505588930100203
+    },
+    "answer_chars": 59,
+    "answer": "No, It was scrapped on 12 March 1926 at Kure Naval Arsenal.",
+    "raw_answer": "No, It was scrapped on 12 March 1926 at Kure Naval Arsenal."
+  },
+  {
+    "question": "Did Itsukushima survive World War II?",
+    "run": 3,
+    "timings": {
+      "stt": 0.4970004190108739,
+      "retrieve": 0.0070445289893541485,
+      "generate": 0.32843707301071845,
+      "verify": 0.0019858039740938693,
+      "tts": 0.23144843100453727,
+      "total": 1.0659162559895776
+    },
+    "answer_chars": 59,
+    "answer": "No, It was scrapped on 12 March 1926 at Kure Naval Arsenal.",
+    "raw_answer": "No, It was scrapped on 12 March 1926 at Kure Naval Arsenal."
+  },
+  {
+    "question": "Did Itsukushima survive World War II?",
+    "run": 4,
+    "timings": {
+      "stt": 0.514322449977044,
+      "retrieve": 0.0075080509996041656,
+      "generate": 0.3491968510206789,
+      "verify": 0.0019941729842685163,
+      "tts": 0.23245999298524112,
+      "total": 1.1054815179668367
+    },
+    "answer_chars": 59,
+    "answer": "No, It was scrapped on 12 March 1926 at Kure Naval Arsenal.",
+    "raw_answer": "No, It was scrapped on 12 March 1926 at Kure Naval Arsenal."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 0,
+    "timings": {
+      "stt": 0.5491825779899955,
+      "retrieve": 0.00717371900100261,
+      "generate": 1.408248891995754,
+      "verify": 0.0020314999856054783,
+      "tts": 0.09976775399991311,
+      "total": 2.0664044429722708
+    },
+    "answer_chars": 23,
+    "answer": "8 centimetres (3.1 in).",
+    "raw_answer": "8 centimetres (3.1 in)."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 1,
+    "timings": {
+      "stt": 0.5129181910015177,
+      "retrieve": 0.00815161198261194,
+      "generate": 0.24658282799646258,
+      "verify": 0.0020912390027660877,
+      "tts": 0.06862824197742157,
+      "total": 0.8383721119607799
+    },
+    "answer_chars": 23,
+    "answer": "8 centimetres (3.1 in).",
+    "raw_answer": "8 centimetres (3.1 in)."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 2,
+    "timings": {
+      "stt": 0.4983150239859242,
+      "retrieve": 0.008218682021833956,
+      "generate": 0.2413420349766966,
+      "verify": 0.0020677100110333413,
+      "tts": 0.1025994949741289,
+      "total": 0.852542945969617
+    },
+    "answer_chars": 23,
+    "answer": "8 centimetres (3.1 in).",
+    "raw_answer": "8 centimetres (3.1 in)."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 3,
+    "timings": {
+      "stt": 0.5112189989886247,
+      "retrieve": 0.007362976990407333,
+      "generate": 0.24669670101138763,
+      "verify": 0.001981755980523303,
+      "tts": 0.07373466898570769,
+      "total": 0.8409951019566506
+    },
+    "answer_chars": 23,
+    "answer": "8 centimetres (3.1 in).",
+    "raw_answer": "8 centimetres (3.1 in)."
+  },
+  {
+    "question": "What's the maximum recorded length of the black-faced blenny?",
+    "run": 4,
+    "timings": {
+      "stt": 0.5296689609822351,
+      "retrieve": 0.007047717983368784,
+      "generate": 0.24825744301779196,
+      "verify": 0.0020561419951263815,
+      "tts": 0.08180315399658866,
+      "total": 0.8688334179751109
+    },
+    "answer_chars": 23,
+    "answer": "8 centimetres (3.1 in).",
+    "raw_answer": "8 centimetres (3.1 in)."
+  },
+  {
+    "question": "Is the black-faced blenny venomous?",
+    "run": 0,
+    "timings": {
+      "stt": 0.5385575229884125,
+      "retrieve": 0.008151213987730443,
+      "generate": 1.0797209739976097,
+      "verify": 0.003249099012464285,
+      "tts": 0.11896425401209854,
+      "total": 1.7486430639983155
+    },
+    "answer_chars": 62,
+    "answer": "No, it does not state that the black-faced blenny is venomous.",
+    "raw_answer": "No, it does not state that the black-faced blenny is venomous."
+  },
+  {
+    "question": "Is the black-faced blenny venomous?",
+    "run": 1,
+    "timings": {
+      "stt": 0.5254024080059025,
+      "retrieve": 0.008225989993661642,
+      "generate": 0.3238793489872478,
+      "verify": 0.0020527880114968866,
+      "tts": 0.14894380600890145,
+      "total": 1.0085043410072103
+    },
+    "answer_chars": 62,
+    "answer": "No, it does not state that the black-faced blenny is venomous.",
+    "raw_answer": "No, it does not state that the black-faced blenny is venomous."
+  },
+  {
+    "question": "Is the black-faced blenny venomous?",
+    "run": 2,
+    "timings": {
+      "stt": 0.5292725649778731,
+      "retrieve": 0.008243176998803392,
+      "generate": 0.3264561320247594,
+      "verify": 0.002249393000965938,
+      "tts": 0.11984896298963577,
+      "total": 0.9860702299920376
+    },
+    "answer_chars": 62,
+    "answer": "No, it does not state that the black-faced blenny is venomous.",
+    "raw_answer": "No, it does not state that the black-faced blenny is venomous."
+  },
+  {
+    "question": "Is the black-faced blenny venomous?",
+    "run": 3,
+    "timings": {
+      "stt": 0.5403603870072402,
+      "retrieve": 0.008020754990866408,
+      "generate": 0.31371784902876243,
+      "verify": 0.00223726499825716,
+      "tts": 0.12534310098271817,
+      "total": 0.9896793570078444
+    },
+    "answer_chars": 62,
+    "answer": "No, it does not state that the black-faced blenny is venomous.",
+    "raw_answer": "No, it does not state that the black-faced blenny is venomous."
+  },
+  {
+    "question": "Is the black-faced blenny venomous?",
+    "run": 4,
+    "timings": {
+      "stt": 0.5491143679828383,
+      "retrieve": 0.007987613993464038,
+      "generate": 0.2559989310102537,
+      "verify": 0.002461045980453491,
+      "tts": 0.10820897502708249,
+      "total": 0.923770933994092
+    },
+    "answer_chars": 45,
+    "answer": "No, a passage does not bear on this question.",
+    "raw_answer": "No, a passage does not bear on this question."
+  },
+  {
+    "question": "What is the capital of Andhra Pradesh?",
+    "run": 0,
+    "timings": {
+      "stt": 0.564050689979922,
+      "retrieve": 0.00881565100280568,
+      "generate": 1.2816861160099506,
+      "verify": 3.838998964056373e-06,
+      "tts": 0.06626709600095637,
+      "total": 1.9208233919925988
+    },
+    "answer_chars": 37,
+    "answer": "I don't know based on your documents.",
+    "raw_answer": "I don't know based on your documents."
+  },
+  {
+    "question": "What is the capital of Andhra Pradesh?",
+    "run": 1,
+    "timings": {
+      "stt": 0.5090422690263949,
+      "retrieve": 0.007842974999221042,
+      "generate": 0.22771038400242105,
+      "verify": 3.4940021578222513e-06,
+      "tts": 0.06443226500414312,
+      "total": 0.809031387034338
+    },
+    "answer_chars": 37,
+    "answer": "I don't know based on your documents.",
+    "raw_answer": "I don't know based on your documents."
+  },
+  {
+    "question": "What is the capital of Andhra Pradesh?",
+    "run": 2,
+    "timings": {
+      "stt": 0.509165427996777,
+      "retrieve": 0.007938293012557551,
+      "generate": 0.22357339598238468,
+      "verify": 3.6809942685067654e-06,
+      "tts": 0.0660360110050533,
+      "total": 0.806716808991041
+    },
+    "answer_chars": 37,
+    "answer": "I don't know based on your documents.",
+    "raw_answer": "I don't know based on your documents."
+  },
+  {
+    "question": "What is the capital of Andhra Pradesh?",
+    "run": 3,
+    "timings": {
+      "stt": 0.4953783469973132,
+      "retrieve": 0.007880293997004628,
+      "generate": 0.2286442500189878,
+      "verify": 3.87697946280241e-06,
+      "tts": 0.061906093993457034,
+      "total": 0.7938128619862255
+    },
+    "answer_chars": 37,
+    "answer": "I don't know based on your documents.",
+    "raw_answer": "I don't know based on your documents."
+  },
+  {
+    "question": "What is the capital of Andhra Pradesh?",
+    "run": 4,
+    "timings": {
+      "stt": 0.5391855190100614,
+      "retrieve": 0.008096376026514918,
+      "generate": 0.23632869697757997,
+      "verify": 3.7070130929350853e-06,
+      "tts": 0.06801993100089021,
+      "total": 0.8516342300281394
+    },
+    "answer_chars": 37,
+    "answer": "I don't know based on your documents.",
+    "raw_answer": "I don't know based on your documents."
+  }
+]

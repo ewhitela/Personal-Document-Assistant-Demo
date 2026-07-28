@@ -70,7 +70,12 @@ dev = [
 packages = ["pdva"]
 
 [tool.ruff.lint]
-ignore = ["BLE001"]
+ignore = [
+    # Health checks and UI handlers must not raise; broad catch is intentional.
+    "BLE001",
+    # FastAPI's Depends/File/Form idiom requires calls in argument defaults.
+    "B008",
+]
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Depends", "fastapi.Query"]
