@@ -16,32 +16,42 @@ support for compute capability < 7.5.
 ## Layout
 
     pdva/
-      types.py              shared dataclasses: Passage, RAGAnswer, TranscriptSegment
-      config.py              shared settings: paths, model names, chunk sizes
-      embedding_index.py     Week 4: DocumentIndex (embedding + retrieval)
-      llm.py                 Week 5: LocalLLM (ollama wrapper)
-      rag.py                 Week 6: RAGPipeline (grounded answering)
-      transcriber.py         Week 7: Transcriber (speech-to-text)
-      tts.py                 Week 8: Speaker (text-to-speech)
-      vision.py              Week 9: VisionModel (optional, image questions)
-      assistant.py           Week 10: Assistant (owns the loaded models, one per process)
-      verifier.py            Week 10: VerifiedRAGPipeline (flags ungrounded claims)
+      types.py               shared dataclasses: Passage, RAGAnswer, TranscriptSegment
+      config.py               shared settings: paths, model names, chunk sizes, RAG_TOP_K
+      embedding_index.py      Week 4: DocumentIndex (embedding + retrieval)
+      llm.py                  Week 5: LocalLLM (ollama wrapper)
+      rag.py                  Week 6: RAGPipeline (grounded answering)
+      transcriber.py          Week 7: Transcriber (speech-to-text)
+      tts.py                  Week 8: Speaker (text-to-speech)
+      vision.py               Week 9: VisionModel (optional, image questions)
+      assistant.py            Week 10: Assistant (owns the loaded models, one per process)
+      verifier.py             Week 10: VerifiedRAGPipeline (flags ungrounded claims, abstains when context doesn't bear on the question)
+      edge_speaker.py         Week 11 (optional): EdgeSpeaker, same interface as Speaker,
+                              backed by an HTTP call to a Jetson-hosted Piper service
+      jetson_tts_service.py   Week 11 (optional): Flask app that runs ON the Jetson
+                              (JetPack 4.6 / Python 3.6), not part of the workstation venv —
+                              wraps the piper CLI binary, exposes /health and /synthesize
 
     service/
-      app.py                 Week 10: FastAPI service orchestrating all modules
+      app.py                  Week 10: FastAPI service orchestrating all modules
 
     ui/
-      streamlit_app.py       Week 10: Streamlit interface (thin client of the service)
+      streamlit_app.py        Week 10: Streamlit interface (thin client of the service)
 
-    demo_voice.py            Standalone capture + wake word + STT sanity check
-                             (mic → openWakeWord "jarona" → VAD → faster-whisper).
-                             Prints the recognized question only — does not call
-                             RAGPipeline/LocalLLM/Speaker. Useful for verifying the
-                             mic, wake word, and STT independently of the full service.
+    demo_voice.py             Standalone capture + wake word + STT sanity check
+                              (mic → openWakeWord "jarona" → VAD → faster-whisper).
+                              Prints the recognized question only — does not call
+                              RAGPipeline/LocalLLM/Speaker. Useful for verifying the
+                              mic, wake word, and STT independently of the full service.
 
     eval/
-      evaluate.py            Retrieval and answer-quality scoring
-      bench_latency.py       Per-stage latency benchmark (the Week 12 deliverable)
+      evaluate.py             Retrieval and answer-quality scoring against the GOLD set
+      bench_latency.py        Per-stage latency benchmark (the Week 12 deliverable)
+      edge_latency.py         Week 11 (optional): local vs. Jetson TTS latency comparison
+
+    docs/
+      architecture.svg        System diagram: service process, RAG+verifier pipeline,
+                              wake listener, optional vision path
 
     tests/
       test_week4_index.py ... test_week10_assistant.py

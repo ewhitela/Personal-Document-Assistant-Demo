@@ -2,7 +2,7 @@
 Compare local vs. edge (Jetson) TTS latency for the same text.
 
 Usage:
-    python eval/measure_edge_latency.py --edge-url http://jetson.local:5000 \
+    python eval/edge_latency.py --edge-url http://jetson.local:5000 \
         --text "This is a latency test." --runs 5
 
 Requires the existing pdva.tts.Speaker for the local leg; imports it
