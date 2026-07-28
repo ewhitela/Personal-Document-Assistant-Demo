@@ -220,19 +220,27 @@ elif selected_view == WAKE_VIEW:
             state_labels.get(wake["state"], f"⚠️ {wake['state']}") + score_suffix
         )
 
+    # Always check for a pending result, even if the listener thread has
+    # already exited by this rerun -- _run() puts the answer on the queue
+    # and *then* flips state to idle, so gating this fetch on wake["running"]
+    # can miss a result that arrived in exactly that gap (confirmed via
+    # manual /voice/wake/result: the answer was sitting there, ready, after
+    # the UI had already shown "Stopped").
+    result = api("GET", "/voice/wake/result").json()
+
+    if result.get("ready"):
+        show_result(result)
+
     if wake["running"]:
-        result = api("GET", "/voice/wake/result").json()
-
-        if result.get("ready"):
-            show_result(result)
-
-        # Poll once a second while this view is active. Since only the
+        # Poll once a second while the listener is active. Since only the
         # selected view's code runs at all now (unlike st.tabs, which ran
         # every tab's body every rerun), this no longer fires while another
-        # view is showing.
+        # view is showing. Once the listener has finished (one utterance
+        # per activation), stop auto-rerunning -- the result above was
+        # already fetched this pass if one was ready.
         time.sleep(1)
         st.rerun()
-
+        
 elif selected_view == "⌨️ Text":
     question = st.text_input("Your question")
 

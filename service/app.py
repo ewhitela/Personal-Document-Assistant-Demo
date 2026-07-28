@@ -65,9 +65,9 @@ WAKE_OWW_FRAME_SAMPLES = 1280  # openWakeWord requires 80ms int16 frames
 WAKE_VAD_FRAME_MS = 30  # webrtcvad only accepts 10/20/30ms
 WAKE_VAD_FRAME_SAMPLES = WAKE_SAMPLE_RATE * WAKE_VAD_FRAME_MS // 1000
 WAKE_THRESHOLD = 0.5
-WAKE_SILENCE_FRAMES_TO_STOP = int(0.8 * 1000 / WAKE_VAD_FRAME_MS)  # ~0.8s silence
+WAKE_SILENCE_FRAMES_TO_STOP = int(1.5 * 1000 / WAKE_VAD_FRAME_MS)
 WAKE_MAX_UTTERANCE_FRAMES = int(15 * 1000 / WAKE_VAD_FRAME_MS)  # 15s hard cap
-WAKE_VAD_AGGRESSIVENESS = 2
+WAKE_VAD_AGGRESSIVENESS = 1
 
 
 @dataclass
@@ -287,9 +287,6 @@ class WakeListener:
 
             from pdva import config
         except Exception as e:
-            # ImportError if a package isn't installed; sounddevice also
-            # raises OSError at import time if the PortAudio *library* is
-            # missing even though the Python package is present.
             self.state = f"error: missing voice dependency ({e})"
             return
 
@@ -320,6 +317,7 @@ class WakeListener:
             return
 
         leftover = np.zeros(0, dtype=np.int16)
+        frames: list = []  # only populated if a complete, non-aborted utterance is captured
 
         try:
             with stream:
@@ -338,9 +336,6 @@ class WakeListener:
                     self.last_score = round(float(score), 3)
                     frame_count += 1
 
-                    # ~1x/second (frames are 80ms each): confirms in the
-                    # server console whether audio is reaching the model at
-                    # all, without needing the Streamlit UI open.
                     if frame_count % 12 == 0:
                         logger.info(
                             "wake listener score=%.3f (threshold=%.2f)",
@@ -352,7 +347,7 @@ class WakeListener:
                         continue
 
                     self.state = "recording"
-                    frames = []
+                    utterance_frames = []
                     silence_run = 0
                     n = 0
 
@@ -362,7 +357,7 @@ class WakeListener:
                         )
                         if vframe is None:
                             break
-                        frames.append(vframe)
+                        utterance_frames.append(vframe)
                         is_speech = vad.is_speech(vframe.tobytes(), WAKE_SAMPLE_RATE)
                         silence_run = 0 if is_speech else silence_run + 1
                         n += 1
@@ -372,18 +367,42 @@ class WakeListener:
                         ):
                             break
 
-                    if self._stop.is_set() or not frames:
-                        break
+                    # A stop request mid-question means abort cleanly -- no
+                    # answering pass on a truncated utterance. Only hand off
+                    # to _handle_utterance if the listener wasn't stopped
+                    # while still recording.
+                    if not self._stop.is_set():
+                        frames = utterance_frames
 
-                    self.state = "answering"
-                    self._handle_utterance(np.concatenate(frames))
-                    self.state = "listening"
+                    # One utterance (or one aborted attempt) per activation --
+                    # the mic closes below either way; re-arming needs an
+                    # explicit start() (the record button).
+                    break
+
+            if frames:
+                self.state = "answering"
+                self._handle_utterance(np.concatenate(frames))
+
         except Exception as e:
             logger.exception("wake listener crashed")
             self.state = f"error: {e}"
             return
 
         self.state = "idle"
+
+    def _drain_for(self, q, seconds: float) -> None:
+        """Discard incoming audio for `seconds`.
+
+        Used after speaking an answer so the TTS played back through this
+        machine's speakers isn't recaptured by the mic as a new wake-word
+        trigger or utterance.
+        """
+        end = time.perf_counter() + seconds
+        while time.perf_counter() < end and not self._stop.is_set():
+            try:
+                q.get(timeout=0.1)
+            except pyqueue.Empty:
+                continue
 
     def _handle_utterance(self, audio_i16) -> None:
         transcriber = self.comp.assistant.transcriber
@@ -430,8 +449,6 @@ class WakeListener:
         body["transcript"] = transcript
         body["timings"] = timings
         self.results.put(body)
-
-
 # Schemas
 
 
