@@ -1,0 +1,67 @@
+<svg width="680" height="460" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>PDVA architecture</title>
+<desc>A FastAPI service process contains the transcriber, RAG pipeline with verifier, and speaker modules in a top-to-bottom pipeline. A wake-word listener feeds the transcriber, an optional vision module sits alongside the speaker, and the document store and Ollama LLM connect to the RAG pipeline from outside the process. A Streamlit UI calls the service over HTTP.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+
+<style>
+text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+.th { font-size: 14px; font-weight: 600; }
+.ts { font-size: 12px; font-weight: 400; }
+</style>
+
+<!-- Streamlit UI -->
+<rect x="400" y="20" width="160" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.75"/>
+<text class="th" x="480" y="38" text-anchor="middle" dominant-baseline="central" fill="#2C2C2A">Streamlit UI</text>
+<text class="ts" x="480" y="56" text-anchor="middle" dominant-baseline="central" fill="#444441">thin HTTP client</text>
+<line x1="480" y1="64" x2="480" y2="160" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<!-- Outer container -->
+<rect x="160" y="90" width="360" height="350" rx="20" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.75"/>
+<text class="th" x="190" y="118" fill="#2C2C2A">FastAPI service</text>
+<text class="ts" x="190" y="136" fill="#444441">one process, all models loaded once</text>
+
+<!-- STT -->
+<rect x="180" y="160" width="320" height="70" rx="10" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.75"/>
+<text class="th" x="340" y="185" text-anchor="middle" dominant-baseline="central" fill="#04342C">Transcriber (STT)</text>
+<text class="ts" x="340" y="207" text-anchor="middle" dominant-baseline="central" fill="#085041">faster-whisper, CPU</text>
+<line x1="340" y1="230" x2="340" y2="250" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<!-- RAG + verifier -->
+<rect x="180" y="250" width="320" height="80" rx="10" fill="#CECBF6" stroke="#534AB7" stroke-width="0.75"/>
+<text class="th" x="340" y="275" text-anchor="middle" dominant-baseline="central" fill="#26215C">RAG pipeline + verifier</text>
+<text class="ts" x="340" y="297" text-anchor="middle" dominant-baseline="central" fill="#3C3489">retrieve, generate, check grounding</text>
+<line x1="340" y1="330" x2="340" y2="350" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<!-- TTS -->
+<rect x="180" y="350" width="320" height="70" rx="10" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.75"/>
+<text class="th" x="340" y="375" text-anchor="middle" dominant-baseline="central" fill="#04342C">Speaker (TTS)</text>
+<text class="ts" x="340" y="397" text-anchor="middle" dominant-baseline="central" fill="#085041">Piper, CPU</text>
+
+<!-- Wake word -->
+<rect x="50" y="160" width="100" height="70" rx="10" fill="#F5C4B3" stroke="#993C1D" stroke-width="0.75"/>
+<text class="th" x="100" y="185" text-anchor="middle" dominant-baseline="central" fill="#4A1B0C">Wake word</text>
+<text class="ts" x="100" y="207" text-anchor="middle" dominant-baseline="central" fill="#712B13">mic + VAD</text>
+<line x1="150" y1="195" x2="180" y2="195" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<!-- Documents -->
+<rect x="50" y="255" width="100" height="70" rx="10" fill="#F1EFE8" stroke="#888780" stroke-width="0.75"/>
+<text class="th" x="100" y="280" text-anchor="middle" dominant-baseline="central" fill="#2C2C2A">Documents</text>
+<text class="ts" x="100" y="302" text-anchor="middle" dominant-baseline="central" fill="#444441">PDF, txt, md</text>
+<line x1="150" y1="290" x2="180" y2="290" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<!-- Ollama -->
+<rect x="530" y="255" width="100" height="70" rx="10" fill="#F1EFE8" stroke="#888780" stroke-width="0.75"/>
+<text class="th" x="580" y="280" text-anchor="middle" dominant-baseline="central" fill="#2C2C2A">Ollama</text>
+<text class="ts" x="580" y="302" text-anchor="middle" dominant-baseline="central" fill="#444441">generation</text>
+<line x1="530" y1="290" x2="500" y2="290" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<!-- Vision -->
+<rect x="530" y="350" width="100" height="70" rx="10" fill="#F1EFE8" stroke="#888780" stroke-width="0.75"/>
+<text class="th" x="580" y="375" text-anchor="middle" dominant-baseline="central" fill="#2C2C2A">Vision</text>
+<text class="ts" x="580" y="397" text-anchor="middle" dominant-baseline="central" fill="#444441">separate path</text>
+<line x1="530" y1="385" x2="500" y2="385" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+</svg>

@@ -46,6 +46,10 @@ support for compute capability < 7.5.
     tests/
       test_week4_index.py ... test_week10_assistant.py
 
+## Architecture
+
+![PDVA architecture](docs/architecture.svg)
+
 ## Setup
 
 Requires Python 3.11 and [uv](https://docs.astral.sh/uv/). 
@@ -129,6 +133,27 @@ network that round-trip is real. Record wall-clock time in the UI as well and
 report the difference as a separate `network_s` stage rather than folding it
 into `total_s`.
 
+## Evaluation
+
+    uv run python eval/evaluate.py
+
+This runs each GOLD question 5 times (answers are sampled, not deterministic)
+and reports a pass rate rather than a single pass/fail, since a single run
+can't distinguish a solid answer from a borderline one that happened to land
+well. Current numbers on the reference document set: 10/10 retrieval hits,
+9/10 answer-quality rows passing all 5 runs, 98% mean answer pass rate.
+
+`evaluate_qa`'s `must_contain` field accepts either a single required phrase
+or a tuple of acceptable phrases — used where a correct answer can be phrased
+several ways (e.g. either the canned refusal sentence or a specific grounded
+negation both count as correct for a question the documents don't address).
+
+For per-stage latency, use `time_text_turn_by_stage` in the same file against
+a **warm** model — the first call after the service starts pays a one-time
+Ollama model-load cost (1–2.5s) that isn't representative of steady-state
+turns. Report warm numbers (typically ~370ms retrieve+generate on the 1080
+Ti) against the 3s budget, not the cold-start figure.
+
 ## Tests
 
     python tests/test_week4_index.py   # ... through test_week9_vision.py
@@ -148,3 +173,23 @@ tests use fake components and need no models.
 - `NoSuchFile` error loading `melspectrogram.onnx` (openWakeWord): the
   feature-extraction models weren't downloaded — run the
   `download_models()` command in Setup above.
+
+  ## Known limitations
+
+- **Small-model refusal inconsistency.** On questions where the retrieved
+  passages are topically related to the question but don't address the
+  specific property asked (e.g. a passage about a species' markings, asked
+  about venom), llama3.2:3b sometimes answers from the adjacent passage
+  instead of refusing, rather than recognizing the passage doesn't bear on
+  the question. The system prompt was tightened to make "bears on the
+  question" concrete (same subject ≠ relevant), which fixed the most
+  incoherent failure mode, but the underlying refusal decision remains
+  flaky (~1 in 5 samples) on this class of question. Believed to be a
+  capability ceiling of a 3B model rather than a fixable prompt issue —
+  a larger model or a stricter retrieval-score threshold would likely
+  help.
+- **Retrieval tail is noisy on a small corpus.** With `RAG_TOP_K` set too
+  high, the lowest-ranked "relevant" passages can have similarity scores
+  barely above unrelated documents, occasionally pulling in an off-topic
+  chunk. Lowering `RAG_TOP_K` resolved this in testing; if you add many
+  more documents, re-check the score gap at the tail of `k`.

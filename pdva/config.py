@@ -27,7 +27,7 @@ LLM_HOST = "http://localhost:11434"
 LLM_TEMPERATURE = 0.05  # low = more deterministic, good for grounded Q&A
 
 # Week 6: how many passages to retrieve per question.
-RAG_TOP_K = 7
+RAG_TOP_K = 6
 
 # Week 7: speech-to-text (faster-whisper).
 WHISPER_MODEL = (

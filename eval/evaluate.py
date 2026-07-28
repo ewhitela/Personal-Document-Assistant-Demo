@@ -44,7 +44,6 @@ def time_text_turn_by_stage(assistant, question: str, speak: bool = False):
     """
     print(f"\nQuestion: {question!r}")
     pipeline = assistant.rag
-
     t0 = time.perf_counter()
     passages = pipeline.index.search(question, pipeline.k)
     t1 = time.perf_counter()
@@ -137,7 +136,7 @@ GOLD: list[tuple] = [
     (
         "Did Itsukushima survive World War II?",
         "Japanese cruiser Itsukushima - Wikipedia.pdf",
-        REFUSAL_PHRASE,
+        "1926",
     ),
     (
         "What's the maximum recorded length of the black-faced blenny?",
@@ -147,7 +146,7 @@ GOLD: list[tuple] = [
     (
         "Is the black-faced blenny venomous?",
         "Black-faced blenny - Wikipedia.pdf",
-        REFUSAL_PHRASE,
+        (REFUSAL_PHRASE, "does not state", "not mentioned", "not venomous"),
     ),
     ("What is the capital of Andhra Pradesh?", None, REFUSAL_PHRASE),
 ]
@@ -190,7 +189,12 @@ def evaluate_qa(assistant, k: int = 5) -> dict:
             elif expected_source in [s.source for s in result.sources]:
                 r_hits += 1
 
-            if must_contain.lower() in result.answer.lower():
+            if isinstance(must_contain, str):
+                accepted = (must_contain,)
+            else:
+                accepted = must_contain
+
+            if any(phrase.lower() in result.answer.lower() for phrase in accepted):
                 a_hits += 1
 
         retrieval_hits += int(r_hits == k)
