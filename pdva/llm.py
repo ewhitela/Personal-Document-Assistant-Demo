@@ -5,7 +5,7 @@ stable: Week 6 calls `generate` and `stream`.
 
 Before you start:
     1. Install ollama (https://ollama.com) and start it.
-    2. Pull a model: `ollama pull llama3.1:8b`
+    2. Pull a model: `ollama pull llama3.2:3b`
     3. `pip install ollama`
 
 Libraries you will import when you implement this:

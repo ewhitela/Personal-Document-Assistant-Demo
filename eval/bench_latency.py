@@ -42,6 +42,10 @@ from pdva.verifier import verify
 BUDGET_S = 3.0
 STAGES = ["stt", "retrieve", "generate", "verify", "tts"]
 
+# Below this sample count, p95 interpolates too close to the observed max to
+# be a stable tail estimate rather than a worst-case; always caveat it.
+P95_CAVEAT_THRESHOLD = 50
+
 DEFAULT_QUESTIONS = [
     "What rivers meet in Pittsburgh, and what do they form?",
     "What was Pittsburgh's historical industry, and how has that changed?",
@@ -195,7 +199,12 @@ def build_rig(audio: str | None, want_tts: bool) -> Rig:
 def timed_turn(rig: Rig, question: str, tts_wav: str) -> dict:
     """Run one turn, timing each stage the way service/app.py does.
 
-    Returns a dict of stage -> seconds (absent stages omitted), plus the answer.
+    NOTE: this calls index.search / build_prompt / llm.generate / verify
+    directly rather than RAGPipeline.answer(), so it assumes answer() does
+    nothing beyond wiring those four calls together. If that assumption is
+    wrong, this benchmark under-reports whatever extra work answer() does.
+    Confirm against rag.py before trusting these numbers as "what the demo
+    actually runs."
     """
     timings: dict[str, float] = {}
 
@@ -238,6 +247,7 @@ def run_benchmark(rig: Rig, questions: list[str], runs: int, warmup: int) -> dic
     overall = Samples()
     per_question: dict[str, Samples] = {}
     raw: list[dict] = []
+    cold_start: dict[str, float] | None = None
 
     fd, tts_wav = tempfile.mkstemp(suffix=".wav")
     os.close(fd)
@@ -245,18 +255,26 @@ def run_benchmark(rig: Rig, questions: list[str], runs: int, warmup: int) -> dic
     try:
         if warmup:
             print(f"warm-up: {warmup} discarded run(s)...")
-            for _ in range(warmup):
-                timed_turn(rig, questions[0], tts_wav)
+            for i in range(warmup):
+                turn = timed_turn(rig, questions[0], tts_wav)
+                if i == 0:
+                    # Only the very first turn is genuinely cold (ollama model
+                    # load, first-call overhead etc). Keep it instead of
+                    # throwing it away, since it's the number worth reporting
+                    # separately from the warm median.
+                    cold_start = turn["timings"]
+                    raw.append(
+                        {
+                            "question": questions[0],
+                            "run": "cold",
+                            "timings": turn["timings"],
+                        }
+                    )
 
         for question in questions:
             samples = Samples()
             per_question[question] = samples
             print(f"\n{question}")
-            for _ in range(warmup):
-                cold = timed_turn(rig, question, tts_wav)
-                raw.append(
-                    {"question": question, "run": "cold", "timings": cold["timings"]}
-                )
             for i in range(runs):
                 turn = timed_turn(rig, question, tts_wav)
                 t = turn["timings"]
@@ -280,7 +298,12 @@ def run_benchmark(rig: Rig, questions: list[str], runs: int, warmup: int) -> dic
     finally:
         Path(tts_wav).unlink(missing_ok=True)
 
-    return {"overall": overall, "per_question": per_question, "raw": raw}
+    return {
+        "overall": overall,
+        "per_question": per_question,
+        "raw": raw,
+        "cold_start": cold_start,
+    }
 
 
 # --- reporting -----------------------------------------------------------------
@@ -307,6 +330,7 @@ def ms(seconds: float) -> str:
 def build_report(results: dict, rig: Rig, runs: int, warmup: int) -> str:
     overall: Samples = results["overall"]
     per_question: dict[str, Samples] = results["per_question"]
+    cold_start: dict | None = results.get("cold_start")
 
     stamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     lines = [
@@ -331,7 +355,7 @@ def build_report(results: dict, rig: Rig, runs: int, warmup: int) -> str:
             f"{config.WHISPER_DEVICE} ({config.WHISPER_COMPUTE})"
         ),
         f"- TTS: Piper `{config.PIPER_VOICE}` (CUDA: {config.PIPER_USE_CUDA})",
-        f"- {runs} timed runs per question, {warmup} warm-up run(s) discarded",
+        f"- {runs} timed runs per question, {warmup} cold warm-up run(s) discarded",
         f"- Budget: {BUDGET_S:.0f} s from question to spoken answer",
         "",
     ]
@@ -396,13 +420,24 @@ def build_report(results: dict, rig: Rig, runs: int, warmup: int) -> str:
                 f"{BUDGET_S:.0f} s budget."
             ),
         ]
-        if len(overall.values.get("total", [])) < 20:
+        if cold_start and "total" in cold_start:
             lines += [
                 "",
                 (
-                    "With this few samples p95 sits close to the observed "
-                    "maximum; treat it as a worst-case rather than a stable "
-                    "tail estimate."
+                    f"Cold first turn: **{cold_start['total']:.2f} s** "
+                    f"(includes ollama's one-time model load). Warm median "
+                    f"is {total['median']:.2f} s — the gap is load time, not "
+                    "steady-state latency."
+                ),
+            ]
+        n_total = len(overall.values.get("total", []))
+        if n_total < P95_CAVEAT_THRESHOLD:
+            lines += [
+                "",
+                (
+                    f"With only {n_total} samples, p95 interpolates close to "
+                    "the observed maximum; treat it as a worst-case rather "
+                    "than a stable tail estimate."
                 ),
             ]
         slowest = max(
