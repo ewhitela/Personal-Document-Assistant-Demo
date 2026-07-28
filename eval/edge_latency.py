@@ -13,8 +13,8 @@ import argparse
 import statistics
 import time
 
-from pdva.tts import Speaker
 from pdva.edge_speaker import EdgeSpeaker
+from pdva.tts import Speaker
 
 
 def timed(fn, *args, **kwargs):
@@ -34,18 +34,22 @@ def main():
     edge = EdgeSpeaker(args.edge_url)
 
     if not edge.is_ready():
-        print("WARNING: edge service at {} is not ready".format(args.edge_url))
+        print(f"WARNING: edge service at {args.edge_url} is not ready")
 
     local_times, edge_times = [], []
     for i in range(args.runs):
-        local_times.append(timed(local.synthesize, args.text, "/tmp/local_{}.wav".format(i)))
-        edge_times.append(timed(edge.synthesize, args.text, "/tmp/edge_{}.wav".format(i)))
+        local_times.append(timed(local.synthesize, args.text, f"/tmp/local_{i}.wav"))
+        edge_times.append(timed(edge.synthesize, args.text, f"/tmp/edge_{i}.wav"))
 
-    print("local : mean={:.3f}s  stdev={:.3f}s  runs={}".format(
-        statistics.mean(local_times), statistics.stdev(local_times) if args.runs > 1 else 0.0, args.runs))
-    print("edge  : mean={:.3f}s  stdev={:.3f}s  runs={}".format(
-        statistics.mean(edge_times), statistics.stdev(edge_times) if args.runs > 1 else 0.0, args.runs))
-    print("delta : {:+.3f}s (edge - local)".format(statistics.mean(edge_times) - statistics.mean(local_times)))
+    print(
+        f"local : mean={statistics.mean(local_times):.3f}s  stdev={statistics.stdev(local_times) if args.runs > 1 else 0.0:.3f}s  runs={args.runs}"
+    )
+    print(
+        f"edge  : mean={statistics.mean(edge_times):.3f}s  stdev={statistics.stdev(edge_times) if args.runs > 1 else 0.0:.3f}s  runs={args.runs}"
+    )
+    print(
+        f"delta : {statistics.mean(edge_times) - statistics.mean(local_times):+.3f}s (edge - local)"
+    )
 
 
 if __name__ == "__main__":

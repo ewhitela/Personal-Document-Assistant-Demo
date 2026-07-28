@@ -45,8 +45,12 @@ class EdgeSpeaker:
             timeout=self.timeout_s,
         )
         if not r.ok:
-            detail = r.json().get("error", r.text) if r.headers.get("content-type", "").startswith("application/json") else r.text
-            raise RuntimeError("edge synthesize failed ({}): {}".format(r.status_code, detail))
+            detail = (
+                r.json().get("error", r.text)
+                if r.headers.get("content-type", "").startswith("application/json")
+                else r.text
+            )
+            raise RuntimeError(f"edge synthesize failed ({r.status_code}): {detail}")
 
         with open(out_path, "wb") as f:
             f.write(r.content)

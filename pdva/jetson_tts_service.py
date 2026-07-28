@@ -25,34 +25,39 @@ import os
 import subprocess
 import tempfile
 
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, jsonify, request, send_file
 
 app = Flask(__name__)
 
 PIPER_BIN = os.environ.get("PIPER_BIN", "piper")
 PIPER_VOICE = os.environ.get("PIPER_VOICE")
-PIPER_CONFIG = os.environ.get("PIPER_CONFIG", (PIPER_VOICE + ".json") if PIPER_VOICE else None)
+PIPER_CONFIG = os.environ.get(
+    "PIPER_CONFIG", (PIPER_VOICE + ".json") if PIPER_VOICE else None
+)
 SYNTH_TIMEOUT_S = float(os.environ.get("PIPER_TIMEOUT_S", "25"))
 
 
 def _piper_ready():
     if not PIPER_VOICE or not os.path.exists(PIPER_VOICE):
-        return False, "voice model not found: {}".format(PIPER_VOICE)
+        return False, f"voice model not found: {PIPER_VOICE}"
     try:
         subprocess.run(
             [PIPER_BIN, "--help"],
             capture_output=True,
             timeout=5,
+            check=False,
         )
     except (FileNotFoundError, subprocess.TimeoutExpired) as e:
-        return False, "piper binary not runnable: {}".format(e)
+        return False, f"piper binary not runnable: {e}"
     return True, "ok"
 
 
 @app.route("/health", methods=["GET"])
 def health():
     ok, detail = _piper_ready()
-    return jsonify({"status": "ok" if ok else "error", "detail": detail}), (200 if ok else 503)
+    return jsonify({"status": "ok" if ok else "error", "detail": detail}), (
+        200 if ok else 503
+    )
 
 
 @app.route("/synthesize", methods=["POST"])
@@ -80,9 +85,11 @@ def synthesize():
             check=True,
         )
     except subprocess.CalledProcessError as e:
-        return jsonify({"error": "piper failed", "stderr": e.stderr.decode("utf-8", "ignore")}), 500
+        return jsonify(
+            {"error": "piper failed", "stderr": e.stderr.decode("utf-8", "ignore")}
+        ), 500
     except subprocess.TimeoutExpired:
-        return jsonify({"error": "piper timed out after {}s".format(SYNTH_TIMEOUT_S)}), 504
+        return jsonify({"error": f"piper timed out after {SYNTH_TIMEOUT_S}s"}), 504
 
     if not os.path.exists(out_path):
         return jsonify({"error": "piper produced no output"}), 500

@@ -48,8 +48,12 @@ support for compute capability < 7.5.
 
 ## Setup
 
-Requires Python 3.11 and [uv](https://docs.astral.sh/uv/). Dependencies are
-locked in `uv.lock`, which resolves both Linux and macOS from one file — the
+Requires Python 3.11 and [uv](https://docs.astral.sh/uv/). 
+
+Activate virtual environment by running:
+    source .venv/bin/activate
+
+Dependencies are locked in `uv.lock`, which resolves both Linux and macOS from one file — the
 same command works on the workstation and the laptop:
 
     uv sync --frozen              # core system
