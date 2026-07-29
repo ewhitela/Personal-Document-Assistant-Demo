@@ -291,7 +291,10 @@ class WakeListener:
             return
 
         try:
-            oww = WakeWordModel(wakeword_models=[config.OPENWAKEWORD_MODEL])
+            oww = WakeWordModel(
+                wakeword_models=[config.OPENWAKEWORD_MODEL],
+                inference_framework="onnx",
+            )
         except Exception as e:
             self.state = f"error: could not load wake-word model ({e})"
             return
@@ -635,6 +638,8 @@ def create_app(components: Components | None = None) -> FastAPI:
         fd, path = tempfile.mkstemp(suffix=suffix)
         os.close(fd)
         try:
+            with open(path, "wb") as out:
+                shutil.copyfileobj(image.file, out)
             t0 = time.perf_counter()
             q = question.strip()
             if q:
