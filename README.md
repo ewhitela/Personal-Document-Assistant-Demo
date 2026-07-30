@@ -111,8 +111,7 @@ Two terminals, from the project root:
     uv run streamlit run ui/streamlit_app.py       # terminal 2: the UI
 
 Open http://localhost:8501. In the sidebar, upload .txt/.md/.pdf documents
-and click "Index uploads". Then ask a question — by typing, or by recording
-in the Voice tab (requires a browser with microphone access; Streamlit
+and click "Index uploads". Then ask a question — by typing, or by recording through the wake word tab; Streamlit
 >= 1.39). Toggle "Speak answers" to hear responses read aloud.
 
 Each answer shows its sources and a per-stage latency breakdown
