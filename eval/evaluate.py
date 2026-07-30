@@ -123,7 +123,7 @@ GOLD: list[tuple] = [
     (
         "Did Flagstaff launch a bid to host the 1960 Winter Olympics?",
         "Flagstaff, Arizona - Wikipedia.pdf",
-        ("unsuccessful", "did not", "failed"),
+        ("yes", "launched"),
     ),
     (
         (
