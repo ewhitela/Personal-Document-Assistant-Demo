@@ -465,6 +465,17 @@ class AskRequest(BaseModel):
 class SpeakRequest(BaseModel):
     text: str
 
+def warmup_llm(comp: Components) -> None:
+    """Force the LLM into VRAM at startup instead of on the first real request."""
+    if comp.assistant.rag is None:
+        return
+    llm = comp.assistant.rag.llm
+    t0 = time.perf_counter()
+    try:
+        llm.generate("Hi", system="Reply with one word.")
+        logger.info("LLM warmed up in %.2fs", time.perf_counter() - t0)
+    except Exception:
+        logger.exception("LLM warmup failed; first /ask will pay the cold-start cost")
 
 def create_app(components: Components | None = None) -> FastAPI:
     @asynccontextmanager
@@ -477,6 +488,8 @@ def create_app(components: Components | None = None) -> FastAPI:
             t0 = time.perf_counter()
             app.state.comp = build_components()
             logger.info("components loaded in %.1fs", time.perf_counter() - t0)
+
+        warmup_llm(app.state.comp)
 
         app.state.wake_listener = None
         yield
