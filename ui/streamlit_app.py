@@ -140,7 +140,7 @@ with st.sidebar:
 if not service_up:
     st.stop()
 
-VIEWS = ["🎤 Voice", "🗣️ Wake word", "⌨️ Text", "🖼️ Image"]
+VIEWS = ["🗣️ Wake word", "⌨️ Text", "🖼️ Image"]
 WAKE_VIEW = "🗣️ Wake word"
 
 if "active_view" not in st.session_state:
