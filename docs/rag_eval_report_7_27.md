@@ -39,7 +39,7 @@ Identifiers used throughout this log.
 
 The GOLD set established here is ten questions across four documents:
 five extractive, three open-ended, and two whose answers are absent from the
-corpus (expected behaviour: refusal). Fields are
+corpus (expected Behavior: refusal). Fields are
 `(question, expected_source, must_contain)`, with `expected_source = None`
 for the out-of-corpus case.
 
@@ -212,7 +212,7 @@ appears inline rather than under a References heading.
 One run of the Pittsburgh industry question produced: "The steel industry
 represented in the 1970s accounted for a higher share of the region's total
 employment than the medical sector does today." Grounded, verified clean, and
-not an answer to the question. Occasional behaviour of the 3B model latching
+not an answer to the question. Occasional Behavior of the 3B model latching
 onto a real but tangential retrieved fact. Not addressed; recorded as a known
 limitation.
 
