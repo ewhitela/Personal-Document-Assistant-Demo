@@ -13,6 +13,8 @@ Endpoints:
     DELETE /documents/{filename}   remove one file (reset + re-index the rest)
     DELETE /documents              clear everything
     POST   /ask                    text question -> grounded answer + timings
+                                   (web=true adds an opt-in web-search fallback
+                                   when the documents don't answer)
     POST   /voice/ask              audio question -> transcript, answer, timings,
                                    optional base64 WAV of the spoken answer
     POST   /speak                  text -> WAV bytes
@@ -460,6 +462,10 @@ class WakeListener:
 class AskRequest(BaseModel):
     question: str
     speak: bool = False
+    # Opt-in only. When true and the document path abstains, fall back to a web
+    # search (see service/web_fallback.py). Off by default: this is the one
+    # code path that sends anything off the device.
+    web: bool = False
 
 
 class SpeakRequest(BaseModel):
@@ -583,7 +589,14 @@ def create_app(components: Components | None = None) -> FastAPI:
         if not req.question.strip():
             raise HTTPException(400, "Empty question")
 
-        body, timings = answer_with_timings(comp(), req.question)
+        if req.web:
+            # Imported here, not at module scope: web_fallback imports
+            # answer_with_timings from this module.
+            from .web_fallback import answer_with_web_fallback
+
+            body, timings = answer_with_web_fallback(comp(), req.question)
+        else:
+            body, timings = answer_with_timings(comp(), req.question)
 
         if req.speak:
             body["audio_b64"], timings["tts_s"] = synthesize_b64(comp(), body["answer"])

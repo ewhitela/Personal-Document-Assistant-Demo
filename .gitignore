@@ -24,3 +24,6 @@ pdva_store/
 *.ipynb
 .venv/
 scratch/
+
+# Secrets
+.env

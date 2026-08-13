@@ -122,6 +122,29 @@ service:
 
     python demo_voice.py
 
+## Web search fallback (optional)
+
+The sidebar toggle "Search the web if not found" turns on a fallback that
+fires only when the documents don't answer the question — that is, when the
+verifier returns the abstention. The web snippets are then run through the
+same prompt, model, and grounding checks as a document answer, and the reply
+is labelled as web-sourced in the UI.
+
+This is off by default and is the only path in the project that leaves the
+device. When it fires, the question text is sent to the search provider; your
+documents, filenames, and index are not.
+
+To enable it, set a [Tavily](https://tavily.com) key before starting the
+service. Without a key the toggle is inert and answers stay local:
+
+    TAVILY_API_KEY=tvly-...            # required to enable the feature
+    PDVA_WEB_SEARCH_TIMEOUT=5.0        # optional, seconds (default 5.0)
+    PDVA_WEB_SEARCH_RESULTS=5          # optional, results requested (default 5)
+
+Note the latency: a fallback request pays a local retrieve+generate *and* a
+web search plus a second generate, so it will normally exceed the 3-second
+budget. The budget applies to the document path, which is the default.
+
 ## Running across two machines
 
 For a demo where the mic is on a laptop and the models stay on the

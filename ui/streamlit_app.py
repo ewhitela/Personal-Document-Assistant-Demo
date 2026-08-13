@@ -47,7 +47,15 @@ def show_result(body: dict) -> None:
         st.warning("No speech detected — try again.")
         return
 
+    if body.get("source_mode") == "web":
+        st.info("🌐 Not found in your documents — answered from a web search.")
+
     st.markdown(body["answer"])
+
+    # Only shown when the fallback ran but did not produce the answer, so the
+    # user can tell "web search found nothing" from "web search never ran".
+    if body.get("source_mode") == "documents" and body.get("web_status"):
+        st.caption(f"Web fallback: {body['web_status']}")
 
     if body.get("audio_b64"):
         st.audio(base64.b64decode(body["audio_b64"]), format="audio/wav", autoplay=True)
@@ -132,6 +140,16 @@ with st.sidebar:
         "Speak answers",
         value=False,
         help="Return a Piper-synthesized WAV with each answer",
+    )
+
+    web_fallback = st.toggle(
+        "Search the web if not found",
+        value=False,
+        help=(
+            "If your documents don't answer the question, search the web "
+            "instead. Sends the question text to a third-party search API. "
+            "Your documents never leave the device."
+        ),
     )
 
 
@@ -247,7 +265,13 @@ elif selected_view == "⌨️ Text":
     if st.button("Ask", key="ask_text", type="primary") and question.strip():
         with st.spinner("Answering…"):
             body = api(
-                "POST", "/ask", json={"question": question, "speak": speak_answers}
+                "POST",
+                "/ask",
+                json={
+                    "question": question,
+                    "speak": speak_answers,
+                    "web": web_fallback,
+                },
             ).json()
 
         show_result(body)
