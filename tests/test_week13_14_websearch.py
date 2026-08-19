@@ -96,6 +96,7 @@ WEB_HIT = WebResult(
     score=0.94,
 )
 
+
 def test_results_to_passages_maps_every_field():
     (p,) = results_to_passages([WEB_HIT])
 
@@ -113,6 +114,7 @@ def test_results_to_passages_maps_every_field():
 def test_results_to_passages_handles_a_malformed_url():
     (p,) = results_to_passages([WebResult("T", "not-a-url", "text", 0.1)])
     assert p.source == "web"
+
 
 def test_is_no_answer_recognises_the_abstention():
     assert is_no_answer({"answer": ABSTAIN})
@@ -201,6 +203,7 @@ def test_unconfigured_provider_is_a_quiet_no_op():
         assert "TAVILY_API_KEY" in body["web_status"]
     finally:
         web_fallback._provider, web_fallback._provider_checked = saved
+
 
 def test_ask_endpoint_defaults_to_documents_only():
     """web=false (the default) must not even construct a provider."""
