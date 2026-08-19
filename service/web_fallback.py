@@ -36,6 +36,7 @@ uses fake providers, so it runs offline with no key and no network.
 from __future__ import annotations
 
 import logging
+import re
 import time
 
 from pdva.verifier import ABSTAIN, verify
@@ -92,17 +93,53 @@ def set_provider(provider: WebSearchProvider | None) -> None:
     _provider_checked = True
 
 
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
+
+# Paraphrased refusals the 3B model emits instead of the exact ABSTAIN
+# sentence the system prompt asks for -- e.g. "Canada's main exports are not
+# specified in the passages." Compliance with the exact-string instruction
+# isn't perfect, so relying on ABSTAIN alone misses real abstentions and
+# silently skips the web fallback (the retrieved passages mention the
+# question's subject in passing, so nothing gets flagged as ungrounded and
+# verify() lets the hedge through as a "grounded" answer).
+_PARAPHRASED_REFUSAL_RE = re.compile(
+    r"\bnot\s+(?:specified|mentioned|stated|addressed|discussed|included|"
+    r"covered|available|found|provided|given)\s+in\s+(?:the\s+|your\s+|our\s+)?"
+    r"(?:passages?|documents?|context|sources?|corpus)\b"
+    r"|\b(?:passages?|documents?|context|sources?|corpus)\s+"
+    r"(?:do not|don't|does not|doesn't)\s+"
+    r"(?:mention|specify|state|address|include|discuss|cover|contain)\b"
+    r"|\bno\s+(?:mention|information|details?)\s+(?:of|about|on|regarding)\b"
+    r"[^.]*\bin\s+(?:the\s+|your\s+|our\s+)?"
+    r"(?:passages?|documents?|context|sources?)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_paraphrased_refusal(answer: str) -> bool:
+    """Deliberately narrow: fires only when the *entire* answer is one
+    sentence matching the hedge pattern, so a genuine partial answer that
+    legitimately covers one part of a multi-part question and flags the rest
+    as unaddressed is left alone -- that's a real answer, not a refusal.
+    """
+    sentences = [s for s in _SENTENCE_SPLIT_RE.split(answer.strip()) if s]
+    return len(sentences) == 1 and bool(_PARAPHRASED_REFUSAL_RE.search(sentences[0]))
+
+
 def is_no_answer(body: dict) -> bool:
     """True when the document path found nothing worth saying.
 
-    Three shapes count as "no answer": the exact ABSTAIN sentence, an empty
-    answer, and a body the verifier marked as abstained (which covers the case
-    where every sentence was stripped as ungrounded).
+    Four shapes count as "no answer": the exact ABSTAIN sentence, an empty
+    answer, a body the verifier marked as abstained (every sentence stripped
+    as ungrounded), and a single-sentence paraphrased refusal that says the
+    same thing as ABSTAIN in different words.
     """
     answer = (body.get("answer") or "").strip()
     if not answer or answer == ABSTAIN:
         return True
-    return bool(body.get("verification", {}).get("abstained"))
+    if body.get("verification", {}).get("abstained"):
+        return True
+    return _is_paraphrased_refusal(answer)
 
 
 def answer_with_web_fallback(

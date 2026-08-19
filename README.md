@@ -107,7 +107,7 @@ setup is required beyond ollama's own.
 
 Two terminals, from the project root:
 
-    uv run uvicorn service.app:app --port 8080     # terminal 1: the service
+    uv run --env-file .env uvicorn service.app:app --host 127.0.0.1 --port 8080     # terminal 1: the service
     uv run streamlit run ui/streamlit_app.py       # terminal 2: the UI
 
 Open http://localhost:8501. In the sidebar, upload .txt/.md/.pdf documents

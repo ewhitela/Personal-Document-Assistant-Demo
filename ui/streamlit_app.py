@@ -48,7 +48,9 @@ def show_result(body: dict) -> None:
         return
 
     if body.get("source_mode") == "web":
-        st.info("🌐 Not found in your documents — answered from a web search.")
+        st.info(
+            "🌐 I couldn't find anything in your documents, so I answered from a web search."
+        )
 
     st.markdown(body["answer"])
 
@@ -108,15 +110,19 @@ with st.sidebar:
         st.subheader("Documents")
         docs = api("GET", "/documents").json()["documents"]
 
-        for name in docs:
-            col1, col2 = st.columns([5, 1])
-            col1.write(name)
+        to_remove = [name for name in docs if st.checkbox(name, key=f"chk_{name}")]
 
-            if col2.button("✕", key=f"del_{name}", help=f"Remove {name}"):
-                with st.spinner(f"Removing {name} and rebuilding index…"):
-                    api("DELETE", f"/documents/{name}")
+        if st.button(
+            f"Remove selected ({len(to_remove)})",
+            disabled=not to_remove,
+            help="Delete the checked documents and rebuild the index once",
+        ):
+            with st.spinner(
+                f"Removing {len(to_remove)} document(s) and rebuilding index…"
+            ):
+                api("POST", "/documents/remove", json={"filenames": to_remove})
 
-                st.rerun()
+            st.rerun()
 
         uploads = st.file_uploader(
             "Add documents", type=["txt", "md", "pdf"], accept_multiple_files=True

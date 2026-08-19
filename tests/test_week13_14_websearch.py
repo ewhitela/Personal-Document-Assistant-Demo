@@ -123,6 +123,31 @@ def test_is_no_answer_recognises_the_abstention():
     assert not is_no_answer({"answer": "Everest is 8849 metres tall."})
 
 
+# -- paraphrased refusals (the model didn't emit the literal ABSTAIN string) -
+
+
+def test_is_no_answer_catches_a_paraphrased_refusal():
+    """The bug this guards: passages that mention the question's subject in
+    passing (without answering it) let a hedge sentence pass verify() as
+    "grounded", since nothing in it is fabricated. Without this, the web
+    fallback silently never fires for exactly the questions it exists for."""
+    assert is_no_answer(
+        {"answer": "Canada's main exports are not specified in the passages."}
+    )
+    assert is_no_answer({"answer": "The documents don't mention pricing."})
+    assert is_no_answer(
+        {"answer": "There is no information about refunds in the passages."}
+    )
+
+
+def test_is_no_answer_leaves_a_genuine_partial_answer_alone():
+    """A real answer that covers one part of a multi-part question and notes
+    the rest isn't addressed must NOT be treated as a refusal -- that would
+    throw away a correct document answer and send it to the web instead."""
+    answer = "Rent is $500 per month. The lease does not specify a late fee."
+    assert not is_no_answer({"answer": answer})
+
+
 def test_documents_answer_means_the_web_is_never_touched():
     c = make_components([EVEREST], "Mount Everest is 8849 metres tall.")
     provider = FakeProvider(results=[WEB_HIT])
@@ -133,6 +158,19 @@ def test_documents_answer_means_the_web_is_never_touched():
     assert provider.calls == []  # the point: no question leaves the device
     assert "web_search_s" not in timings
     assert body["sources"][0]["source"] == "peaks.txt"
+
+
+def test_paraphrased_refusal_falls_back_to_the_web():
+    """End-to-end version of the Canada-exports bug: the local model hedges
+    instead of emitting ABSTAIN, and the web fallback must still fire."""
+    hedge = "Canada's main exports are not specified in the passages."
+    c = make_components([EVEREST], hedge, "Timber, oil, and vehicles.")
+    provider = FakeProvider(results=[WEB_HIT])
+
+    body, _ = answer_with_web_fallback(c, "What are Canada's main exports?", provider)
+
+    assert body["source_mode"] == "web"
+    assert provider.calls == ["What are Canada's main exports?"]
 
 
 # -- the happy fallback path ------------------------------------------------

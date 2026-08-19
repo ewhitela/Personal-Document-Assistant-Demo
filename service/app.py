@@ -10,7 +10,8 @@ Endpoints:
     GET    /health                 readiness of each component + chunk count
     GET    /documents              filenames currently in the docs dir
     POST   /documents              upload + index one or more files
-    DELETE /documents/{filename}   remove one file (reset + re-index the rest)
+    POST   /documents/remove       remove one or more files (reset + re-index the rest,
+                                   once for the whole batch)
     DELETE /documents              clear everything
     POST   /ask                    text question -> grounded answer + timings
                                    (web=true adds an opt-in web-search fallback
@@ -472,6 +473,10 @@ class SpeakRequest(BaseModel):
     text: str
 
 
+class RemoveDocumentsRequest(BaseModel):
+    filenames: list[str]
+
+
 def warmup_llm(comp: Components) -> None:
     """Force the LLM into VRAM at startup instead of on the first real request."""
     if comp.assistant.rag is None:
@@ -562,17 +567,33 @@ def create_app(components: Components | None = None) -> FastAPI:
             "index_s": round(time.perf_counter() - t0, 3),
         }
 
-    @app.delete("/documents/{filename}")
-    def delete_document(filename: str):
-        target = DOCS_DIR / Path(filename).name
+    @app.post("/documents/remove")
+    def remove_documents(req: RemoveDocumentsRequest):
+        """Remove one or more files, then reset + re-index once for the whole
+        batch. This is the reason it's a batch endpoint rather than N calls to
+        a per-file delete: reindex_docs_dir() rebuilds the entire index, so
+        deleting k files one-by-one costs k full rebuilds instead of one.
+        """
+        if not req.filenames:
+            raise HTTPException(400, "No filenames provided")
 
-        if not target.exists():
-            raise HTTPException(404, f"Not indexed: {filename}")
+        removed, missing = [], []
 
-        target.unlink()
+        for filename in req.filenames:
+            target = DOCS_DIR / Path(filename).name
+
+            if target.exists():
+                target.unlink()
+                removed.append(target.name)
+            else:
+                missing.append(filename)
+
+        if not removed:
+            raise HTTPException(404, f"Not indexed: {missing}")
+
         chunks = reindex_docs_dir(comp())
 
-        return {"removed": target.name, "chunks_remaining": chunks}
+        return {"removed": removed, "missing": missing, "chunks_remaining": chunks}
 
     @app.delete("/documents")
     def clear_documents():
